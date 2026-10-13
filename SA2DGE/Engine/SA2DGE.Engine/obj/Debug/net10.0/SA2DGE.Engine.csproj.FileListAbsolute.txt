@@ -1,0 +1,12 @@
+C:\Users\patha\Documents\Game Development\Shreyas's Advanced 2-Dimensional Game Engine\SA2DGE\Engine\SA2DGE.Engine\bin\Debug\net10.0\SA2DGE.Engine.deps.json
+C:\Users\patha\Documents\Game Development\Shreyas's Advanced 2-Dimensional Game Engine\SA2DGE\Engine\SA2DGE.Engine\bin\Debug\net10.0\SA2DGE.Engine.dll
+C:\Users\patha\Documents\Game Development\Shreyas's Advanced 2-Dimensional Game Engine\SA2DGE\Engine\SA2DGE.Engine\bin\Debug\net10.0\SA2DGE.Engine.pdb
+C:\Users\patha\Documents\Game Development\Shreyas's Advanced 2-Dimensional Game Engine\SA2DGE\Engine\SA2DGE.Engine\obj\Debug\net10.0\SA2DGE.Engine.csproj.AssemblyReference.cache
+C:\Users\patha\Documents\Game Development\Shreyas's Advanced 2-Dimensional Game Engine\SA2DGE\Engine\SA2DGE.Engine\obj\Debug\net10.0\SA2DGE.Engine.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\patha\Documents\Game Development\Shreyas's Advanced 2-Dimensional Game Engine\SA2DGE\Engine\SA2DGE.Engine\obj\Debug\net10.0\SA2DGE.Engine.AssemblyInfoInputs.cache
+C:\Users\patha\Documents\Game Development\Shreyas's Advanced 2-Dimensional Game Engine\SA2DGE\Engine\SA2DGE.Engine\obj\Debug\net10.0\SA2DGE.Engine.AssemblyInfo.cs
+C:\Users\patha\Documents\Game Development\Shreyas's Advanced 2-Dimensional Game Engine\SA2DGE\Engine\SA2DGE.Engine\obj\Debug\net10.0\SA2DGE.Engine.csproj.CoreCompileInputs.cache
+C:\Users\patha\Documents\Game Development\Shreyas's Advanced 2-Dimensional Game Engine\SA2DGE\Engine\SA2DGE.Engine\obj\Debug\net10.0\SA2DGE.Engine.dll
+C:\Users\patha\Documents\Game Development\Shreyas's Advanced 2-Dimensional Game Engine\SA2DGE\Engine\SA2DGE.Engine\obj\Debug\net10.0\refint\SA2DGE.Engine.dll
+C:\Users\patha\Documents\Game Development\Shreyas's Advanced 2-Dimensional Game Engine\SA2DGE\Engine\SA2DGE.Engine\obj\Debug\net10.0\SA2DGE.Engine.pdb
+C:\Users\patha\Documents\Game Development\Shreyas's Advanced 2-Dimensional Game Engine\SA2DGE\Engine\SA2DGE.Engine\obj\Debug\net10.0\ref\SA2DGE.Engine.dll

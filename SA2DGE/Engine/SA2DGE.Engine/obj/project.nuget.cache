@@ -1,0 +1,16 @@
+{
+  "version": 2,
+  "dgSpecHash": "oEjAro1A9Rw=",
+  "success": true,
+  "projectFilePath": "C:\\Users\\patha\\Documents\\Game Development\\Shreyas's Advanced 2-Dimensional Game Engine\\SA2DGE\\Engine\\SA2DGE.Engine\\SA2DGE.Engine.csproj",
+  "expectedPackageFiles": [
+    "C:\\Users\\patha\\.nuget\\packages\\sharpgen.runtime\\2.4.2-beta\\sharpgen.runtime.2.4.2-beta.nupkg.sha512",
+    "C:\\Users\\patha\\.nuget\\packages\\sharpgen.runtime.com\\2.4.2-beta\\sharpgen.runtime.com.2.4.2-beta.nupkg.sha512",
+    "C:\\Users\\patha\\.nuget\\packages\\vortice.d3dcompiler\\3.8.3\\vortice.d3dcompiler.3.8.3.nupkg.sha512",
+    "C:\\Users\\patha\\.nuget\\packages\\vortice.direct3d11\\3.8.3\\vortice.direct3d11.3.8.3.nupkg.sha512",
+    "C:\\Users\\patha\\.nuget\\packages\\vortice.directx\\3.8.3\\vortice.directx.3.8.3.nupkg.sha512",
+    "C:\\Users\\patha\\.nuget\\packages\\vortice.dxgi\\3.8.3\\vortice.dxgi.3.8.3.nupkg.sha512",
+    "C:\\Users\\patha\\.nuget\\packages\\vortice.mathematics\\2.1.0\\vortice.mathematics.2.1.0.nupkg.sha512"
+  ],
+  "logs": []
+}
