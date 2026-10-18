@@ -15,6 +15,7 @@ internal sealed class Direct3D11GraphicsBackend : GraphicsBackend
     private IDXGISwapChain1? _swapChain;
 
     private ID3D11RenderTargetView? _renderTargetView;
+    private ID3D11BlendState? _alphaBlendState;
 
     
 
@@ -23,6 +24,7 @@ internal sealed class Direct3D11GraphicsBackend : GraphicsBackend
         ArgumentNullException.ThrowIfNull(window);
 
         CreateDevice();
+        CreateAlphaBlendState();
         CreateFactory();
         CreateSwapChain(window);
         CreateRenderTarget();
@@ -38,7 +40,10 @@ internal sealed class Direct3D11GraphicsBackend : GraphicsBackend
             _context);
 
         Commands = new Direct3D11GraphicsCommands(
-            _context);
+            _context,
+            _alphaBlendState
+            ?? throw new InvalidOperationException(
+                "The alpha blend state was not initialized."));
         
         Shaders = new Direct3D11GraphicsShaders(
             _device,
@@ -130,6 +135,9 @@ internal sealed class Direct3D11GraphicsBackend : GraphicsBackend
         Commands?.Dispose();
         Commands = null;
         
+        _alphaBlendState?.Dispose();
+        _alphaBlendState = null;
+        
         Shaders = null;
 
         Resources = null;
@@ -197,6 +205,35 @@ internal sealed class Direct3D11GraphicsBackend : GraphicsBackend
                 "Failed to create the Direct3D 11 device context.");
 
         Console.WriteLine("D3D11 device initialized.");
+    }
+    
+    private void CreateAlphaBlendState()
+    {
+        if (_device is null)
+        {
+            throw new InvalidOperationException(
+                "The Direct3D 11 device is not initialized.");
+        }
+
+        BlendDescription description = new()
+        {
+            AlphaToCoverageEnable = false,
+            IndependentBlendEnable = false
+        };
+
+        description.RenderTarget[0] = new RenderTargetBlendDescription
+        {
+            BlendEnable = true,
+            SourceBlend = Blend.SourceAlpha,
+            DestinationBlend = Blend.InverseSourceAlpha,
+            BlendOperation = BlendOperation.Add,
+            SourceBlendAlpha = Blend.One,
+            DestinationBlendAlpha = Blend.InverseSourceAlpha,
+            BlendOperationAlpha = BlendOperation.Add,
+            RenderTargetWriteMask = ColorWriteEnable.All
+        };
+
+        _alphaBlendState = _device.CreateBlendState(description);
     }
 
     private void CreateFactory()

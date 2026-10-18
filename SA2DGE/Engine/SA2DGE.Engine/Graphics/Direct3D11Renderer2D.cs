@@ -787,9 +787,32 @@ public sealed class Direct3D11Renderer2D : Renderer2D
             0,
             _spriteColorBuffer);
 
-        _graphics.Commands.DrawIndexed(6);
+        _graphics.Commands.SetAlphaBlending(true);
 
-        texture.Unbind();
+        _graphics.Commands.SetAlphaBlending(true);
+
+        try
+        {
+            texture.Bind(0);
+
+            _graphics.Commands.SetVertexArray(_spriteVertexArray);
+            _graphics.Commands.SetShaderProgram(_spriteShaderProgram);
+
+            _graphics.Commands.SetVertexConstantBuffer(
+                0,
+                _spriteTransformBuffer);
+
+            _graphics.Commands.SetPixelConstantBuffer(
+                0,
+                _spriteColorBuffer);
+
+            _graphics.Commands.DrawIndexed(6);
+        }
+        finally
+        {
+            texture.Unbind();
+            _graphics.Commands.SetAlphaBlending(false);
+        }
     }
 
     private static void ExecuteCircle(

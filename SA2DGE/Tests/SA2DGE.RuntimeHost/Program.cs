@@ -130,7 +130,9 @@ public override void Initialize()
             pixels[index]     = alternate ? (byte)255 : (byte)30;
             pixels[index + 1] = 0;
             pixels[index + 2] = alternate ? (byte)255 : (byte)30;
-            pixels[index + 3] = 255;
+            pixels[index + 3] = alternate ? (byte)255 : (byte)128;
+            //pixels[index + 3] = alternate ? (byte)255 : (byte)0;
+            //pixels[index + 3] = 255;
         }
     }
 

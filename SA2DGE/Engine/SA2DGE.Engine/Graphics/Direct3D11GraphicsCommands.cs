@@ -8,17 +8,22 @@ namespace SA2DGE.Engine.Graphics;
 internal sealed class Direct3D11GraphicsCommands : GraphicsCommands
 {
     private readonly ID3D11DeviceContext _context;
+    private readonly ID3D11BlendState _alphaBlendState;
+    public Direct3D11GraphicsCommands(
+        ID3D11DeviceContext context,
+        ID3D11BlendState alphaBlendState)
+    {
+        ArgumentNullException.ThrowIfNull(context);
+        ArgumentNullException.ThrowIfNull(alphaBlendState);
+
+        _context = context;
+        _alphaBlendState = alphaBlendState;
+    }
 
     private VertexArray? _vertexArray;
     private ShaderProgram? _shaderProgram;
 
-    public Direct3D11GraphicsCommands(
-        ID3D11DeviceContext context)
-    {
-        ArgumentNullException.ThrowIfNull(context);
-
-        _context = context;
-    }
+    
 
     protected override void SetVertexArrayBackend(
         VertexArray vertexArray)
@@ -66,6 +71,12 @@ internal sealed class Direct3D11GraphicsCommands : GraphicsCommands
         ShaderProgram shaderProgram)
     {
         _shaderProgram = shaderProgram;
+    }
+    
+    protected override void SetAlphaBlendingBackend(bool enabled)
+    {
+        _context.OMSetBlendState(
+            enabled ? _alphaBlendState : null);
     }
 
     protected override void DrawIndexedBackend(

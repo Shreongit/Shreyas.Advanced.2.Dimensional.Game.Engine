@@ -32,6 +32,18 @@ public abstract class GraphicsCommands
 
         SetShaderProgramBackend(shaderProgram);
     }
+    
+    
+    
+    
+    
+    public void SetAlphaBlending(bool enabled)
+    {
+        ThrowIfDisposed();
+
+        SetAlphaBlendingBackend(enabled);
+    }
+    
 
     public void DrawIndexed(int indexCount, int startIndex = 0)
     {
@@ -81,6 +93,11 @@ public abstract class GraphicsCommands
 
     protected abstract void SetShaderProgramBackend(
         ShaderProgram shaderProgram);
+    
+    
+    
+    protected abstract void SetAlphaBlendingBackend(
+        bool enabled);
 
     protected abstract void DrawIndexedBackend(
         int indexCount,
