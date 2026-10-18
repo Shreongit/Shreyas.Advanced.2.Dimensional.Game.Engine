@@ -11,6 +11,10 @@ public readonly struct RenderCommand
     public Vector2 Size { get; }
 
     public float Rotation { get; }
+    
+    public bool FlipHorizontal { get; }
+
+    public bool FlipVertical { get; }
 
     public Color Color { get; }
 
@@ -25,12 +29,16 @@ public readonly struct RenderCommand
         float rotation,
         Color color,
         int layer = 0,
-        object? resource = null)
+        object? resource = null,
+        bool flipHorizontal = false,
+        bool flipVertical = false)
     {
         Type = type;
         Position = position;
         Size = size;
         Rotation = rotation;
+        FlipHorizontal = flipHorizontal;
+        FlipVertical = flipVertical;
         Color = color;
         Layer = layer;
         Resource = resource;
@@ -42,7 +50,9 @@ public readonly struct RenderCommand
         Color color,
         float rotation = 0.0f,
         int layer = 0,
-        object? texture = null)
+        object? texture = null,
+        bool flipHorizontal = false,
+        bool flipVertical = false)
     {
         return new RenderCommand(
             RenderCommandType.Sprite,
@@ -51,7 +61,9 @@ public readonly struct RenderCommand
             rotation,
             color,
             layer,
-            texture);
+            texture,
+            flipHorizontal,
+            flipVertical);
     }
 
     

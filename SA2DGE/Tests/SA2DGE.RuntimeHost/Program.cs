@@ -113,26 +113,43 @@ public override void Initialize()
     
     
     const int textureSize = 64;
-    const int cellSize = 8;
-
-    byte[] pixels = new byte[
-        textureSize * textureSize * 4];
+    byte[] pixels = new byte[textureSize * textureSize * 4];
 
     for (int y = 0; y < textureSize; y++)
     {
         for (int x = 0; x < textureSize; x++)
         {
-            bool alternate =
-                ((x / cellSize) + (y / cellSize)) % 2 == 0;
+            bool left = x < textureSize / 2;
+            bool top = y < textureSize / 2;
 
             int index = (y * textureSize + x) * 4;
 
-            pixels[index]     = alternate ? (byte)255 : (byte)30;
-            pixels[index + 1] = 0;
-            pixels[index + 2] = alternate ? (byte)255 : (byte)30;
-            pixels[index + 3] = alternate ? (byte)255 : (byte)128;
-            //pixels[index + 3] = alternate ? (byte)255 : (byte)0;
-            //pixels[index + 3] = 255;
+            if (top && left) // Top-left: red
+            {
+                pixels[index] = 255;
+                pixels[index + 1] = 0;
+                pixels[index + 2] = 0;
+            }
+            else if (top && !left) // Top-right: green
+            {
+                pixels[index] = 0;
+                pixels[index + 1] = 255;
+                pixels[index + 2] = 0;
+            }
+            else if (!top && left) // Bottom-left: blue
+            {
+                pixels[index] = 0;
+                pixels[index + 1] = 0;
+                pixels[index + 2] = 255;
+            }
+            else // Bottom-right: yellow
+            {
+                pixels[index] = 255;
+                pixels[index + 1] = 255;
+                pixels[index + 2] = 0;
+            }
+
+            pixels[index + 3] = 255;
         }
     }
 
@@ -393,7 +410,9 @@ public override void Render()
         new Vector2(180.0f, 180.0f),
         new Color(1.0f, 1.0f, 1.0f, 1.0f),
         layer: 3,
-        texture: _testTexture);
+        texture: _testTexture,
+        flipHorizontal: true,
+        flipVertical: true);
 
 
     _renderer.EndFrame();

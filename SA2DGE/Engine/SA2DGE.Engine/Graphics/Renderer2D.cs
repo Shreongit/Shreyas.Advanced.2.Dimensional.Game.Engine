@@ -25,7 +25,9 @@ public abstract class Renderer2D : Renderer
         Color color,
         float rotation = 0.0f,
         int layer = 0,
-        object? texture = null)
+        object? texture = null,
+        bool flipHorizontal = false,
+        bool flipVertical = false)
     {
         Draw(
             RenderCommand.Sprite(
@@ -34,7 +36,9 @@ public abstract class Renderer2D : Renderer
                 color,
                 rotation,
                 layer,
-                texture));
+                texture,
+                flipHorizontal,
+                flipVertical));
     }
 
     

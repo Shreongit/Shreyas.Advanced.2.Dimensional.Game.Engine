@@ -35,6 +35,7 @@ public sealed class Direct3D11Renderer2D : Renderer2D
 
     private ConstantBuffer? _spriteTransformBuffer;
     private ConstantBuffer? _spriteColorBuffer;
+    private ConstantBuffer? _spriteFlipBuffer;
 
     private bool _spritePipelineInitialized;
 
@@ -172,6 +173,9 @@ public sealed class Direct3D11Renderer2D : Renderer2D
         
         _spriteColorBuffer?.Dispose();
         _spriteColorBuffer = null;
+        
+        _spriteFlipBuffer?.Dispose();
+        _spriteFlipBuffer = null;
 
         _spriteTransformBuffer?.Dispose();
         _spriteTransformBuffer = null;
@@ -416,6 +420,9 @@ public sealed class Direct3D11Renderer2D : Renderer2D
 
         _spriteColorBuffer =
             resources.CreateConstantBuffer(16);
+        
+        _spriteFlipBuffer =
+            resources.CreateConstantBuffer(16);
 
         // Position (3 floats) + Color (4 floats) + UV (2 floats).
         // Total stride: 36 bytes.
@@ -484,6 +491,11 @@ public sealed class Direct3D11Renderer2D : Renderer2D
             {
                 float4x4 Transform;
             };
+            
+            cbuffer FlipBuffer : register(b1)
+            {
+                float4 FlipFlags;
+            };
 
             struct VSInput
             {
@@ -504,7 +516,19 @@ public sealed class Direct3D11Renderer2D : Renderer2D
                 VSOutput output;
                 output.Position = mul(float4(input.Position, 1.0f), Transform);
                 output.Color = input.Color;
-                output.TexCoord = input.TexCoord;
+                float2 uv = input.TexCoord;
+            
+            if (FlipFlags.x > 0.5f)
+            {
+                uv.x = 1.0f - uv.x;
+            }
+            
+            if (FlipFlags.y > 0.5f)
+            {
+                uv.y = 1.0f - uv.y;
+            }
+            
+            output.TexCoord = uv;
                 return output;
             }
             """;
@@ -770,14 +794,28 @@ public sealed class Direct3D11Renderer2D : Renderer2D
             MemoryMarshal.AsBytes<float>(color);
 
         _spriteColorBuffer.SetData(colorBytes);
+        
+        if (_spriteFlipBuffer is null)
+        {
+            throw new InvalidOperationException(
+                "The sprite flip buffer is not initialized.");
+        }
 
-        texture.Bind(0);
+        float[] flipFlags =
+        {
+            command.FlipHorizontal ? 1.0f : 0.0f,
+            command.FlipVertical ? 1.0f : 0.0f,
+            0.0f,
+            0.0f
+        };
 
-        _graphics.Commands.SetVertexArray(
-            _spriteVertexArray);
+        ReadOnlySpan<byte> flipBytes =
+            MemoryMarshal.AsBytes<float>(flipFlags);
 
-        _graphics.Commands.SetShaderProgram(
-            _spriteShaderProgram);
+        _spriteFlipBuffer.SetData(flipBytes);
+
+        _graphics.Commands.SetVertexArray(_spriteVertexArray);
+        _graphics.Commands.SetShaderProgram(_spriteShaderProgram);
 
         _graphics.Commands.SetVertexConstantBuffer(
             0,
@@ -789,29 +827,26 @@ public sealed class Direct3D11Renderer2D : Renderer2D
 
         _graphics.Commands.SetAlphaBlending(true);
 
-        _graphics.Commands.SetAlphaBlending(true);
-
         try
         {
             texture.Bind(0);
 
-            _graphics.Commands.SetVertexArray(_spriteVertexArray);
-            _graphics.Commands.SetShaderProgram(_spriteShaderProgram);
-
             _graphics.Commands.SetVertexConstantBuffer(
-                0,
-                _spriteTransformBuffer);
-
-            _graphics.Commands.SetPixelConstantBuffer(
-                0,
-                _spriteColorBuffer);
+                1,
+                _spriteFlipBuffer);
 
             _graphics.Commands.DrawIndexed(6);
         }
         finally
         {
-            texture.Unbind();
-            _graphics.Commands.SetAlphaBlending(false);
+            try
+            {
+                texture.Unbind();
+            }
+            finally
+            {
+                _graphics.Commands.SetAlphaBlending(false);
+            }
         }
     }
 
