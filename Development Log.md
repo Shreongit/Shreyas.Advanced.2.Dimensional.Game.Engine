@@ -80,7 +80,7 @@ Stage 2.5 focused on debugging, fixing, and validating bugs found in the Graphic
 
 
 
-# SA2DGE — Stage 2.6 Development Log
+# SA2DGE — Stage 3 Development Log
 
 Stage 2.6 was mainly focused on getting the first real GPU-rendered geometry working in SA2DGE and, more importantly, finding and solving the problems that were preventing the complete Direct3D 11 rendering pipeline from producing visible geometry.
 
@@ -108,8 +108,15 @@ After these problems were solved, SA2DGE successfully reached the complete rende
 
 The final result of today's work is that SA2DGE has crossed an important boundary: it is no longer only capable of initializing Direct3D 11 and displaying a cleared framebuffer, but can now issue a real GPU draw call and produce visible geometry inside the engine window. The colorful rectangle produced during the test is the first proof that the complete SA2DGE geometry-rendering pipeline is functioning.
 
-**Stage 2.6 — D3D11 Basic Geometry Rendering: ✅ Complete**
+**Stage 3 — D3D11 Basic Geometry Rendering: ✅ Complete**
 
-**Next step:** build the higher-level 2D rendering functionality on top of this working GPU geometry pipeline.
 
-**Next step:** build the higher-level 2D rendering functionality on top of this working GPU geometry pipeline.*
+## Stage 4.2.1 — Alpha Blending Support
+
+During Stage 4.2.1, we updated the Direct3D 11 sprite rendering pipeline to support alpha blending for opaque, transparent, and semi-transparent texels, allowing sprite pixels to be rendered with the appropriate transparency behavior instead of treating every pixel as fully opaque. This improves how sprites with transparent backgrounds and partially transparent areas can be composited onto the existing scene.
+
+The development history also records **Stage 3 — Command, 2D Renderer, and GPU**, marking the broader rendering work involving the command system, 2D rendering, and GPU integration.
+
+**Stage 4.2.1 — Alpha Blending: ✅ Committed**
+
+**Next:** Continue validating sprite transparency and blending behavior within the 2D rendering pipeline.
