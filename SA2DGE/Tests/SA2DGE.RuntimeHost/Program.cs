@@ -3,6 +3,7 @@ using SA2DGE.Engine.Core;
 using SA2DGE.Engine.Platform.Window;
 using SA2DGE.Engine.Platform.Input;
 using SA2DGE.Engine.Graphics.Buffers;
+using SA2DGE.Engine.Graphics.Textures;
 using SA2DGE.Engine.Graphics.Shaders;
 using SA2DGE.Engine.Graphics;
 using SA2DGE.Engine.Math;
@@ -51,6 +52,7 @@ internal sealed class RuntimeGame : Game
     private Shader? _fragmentShader;
     private ShaderProgram? _shaderProgram;
     private Direct3D11Renderer2D? _renderer;
+    private Texture2D? _testTexture;
 
 
 public RuntimeGame()
@@ -108,6 +110,44 @@ public override void Initialize()
     
     _renderer = new Direct3D11Renderer2D(Graphics!);
     _renderer.Initialize();
+    
+    
+    const int textureSize = 64;
+    const int cellSize = 8;
+
+    byte[] pixels = new byte[
+        textureSize * textureSize * 4];
+
+    for (int y = 0; y < textureSize; y++)
+    {
+        for (int x = 0; x < textureSize; x++)
+        {
+            bool alternate =
+                ((x / cellSize) + (y / cellSize)) % 2 == 0;
+
+            int index = (y * textureSize + x) * 4;
+
+            pixels[index]     = alternate ? (byte)255 : (byte)30;
+            pixels[index + 1] = 0;
+            pixels[index + 2] = alternate ? (byte)255 : (byte)30;
+            pixels[index + 3] = 255;
+        }
+    }
+
+    if (Graphics!.Resources is null)
+    {
+        throw new InvalidOperationException(
+            "Graphics resources are unavailable.");
+    }
+
+    _testTexture = Graphics.Resources.CreateTexture2D(
+        textureSize,
+        textureSize,
+        TextureFormat.RGBA8,
+        pixels);
+
+    Console.WriteLine("Stage 3 checkerboard texture created.");
+
     
    
 
@@ -344,6 +384,15 @@ public override void Render()
         new Color(0.0f, 0.0f, 1.0f, 1.0f),
         layer: 2,
         rotation: 0.785398f);
+    
+    
+    _renderer.DrawSprite(
+        new Vector2(850.0f, 360.0f),
+        new Vector2(180.0f, 180.0f),
+        new Color(1.0f, 1.0f, 1.0f, 1.0f),
+        layer: 3,
+        texture: _testTexture);
+
 
     _renderer.EndFrame();
     _renderer.Present();
@@ -351,6 +400,8 @@ public override void Render()
 
 public override void Shutdown()
 {
+    _testTexture?.Dispose();
+    _testTexture = null;
     
     _renderer?.Shutdown();
     _renderer?.Dispose();
