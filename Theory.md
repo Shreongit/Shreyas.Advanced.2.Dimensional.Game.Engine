@@ -155,3 +155,35 @@ The tested animation controls, non-looping behavior, and time-based frame advanc
 This is why the stages build on one another. A sprite renderer is not just a single drawing function: it depends on a working runtime, a window, input and event handling where needed, a graphics device, valid resources, shaders, draw commands, texture sampling, and correct rendering state.
 
 In SA2DGE, this functionality provides a foundation for **sprite sheets, animation frames, tile maps, and texture atlases**, where multiple images are stored in a single texture and selected using UV coordinates.
+
+
+# Stage 4.2.4 — Sprite Animation Controls and Behaviour Verification
+
+## Objective
+
+Complete and verify the sprite animation system by testing playback controls, manual frame navigation, looping behaviour, and animation timing.
+
+## Core Concepts
+
+- **Sprite Flipping:** Horizontal and vertical flipping allow sprites to be mirrored without requiring separate texture assets.
+- **UV Region Selection:** UV coordinates select specific regions of a texture or sprite sheet for rendering individual animation frames.
+- **Automatic Frame Advancement:** The animation advances frames according to elapsed time and the configured frame duration.
+- **Playback Controls:** Play, pause, stop, and restart manage the animation's playback state and position.
+- **Looping:** Looping allows an animation to return to its beginning after reaching its final frame.
+- **Manual Frame Control:** Left and right navigation allow individual frames to be selected and inspected directly.
+- **Behaviour Verification:** Testing looping boundaries, timer reset, and restart behaviour helps confirm that animation state transitions work correctly.
+
+## Verification Results
+
+| Stage | Feature | Result |
+|---|---|---|
+| 4.2.1 | Horizontal and vertical sprite flipping | Verified |
+| 4.2.2 | Sprite-sheet UV region selection | Verified |
+| 4.2.3 | Automatic frame advancement and timing | Verified |
+| 4.2.4.1 | Play, pause, stop, restart, and looping controls | Confirmed |
+| 4.2.4.2 | Left/right manual frame navigation | Verified |
+| 4.2.4.3 | Eight animation behaviour checks | All passed |
+
+## Outcome
+
+The sprite animation system's playback controls, manual frame navigation, looping boundaries, timer reset, and restart behaviour passed verification. This completes the current sprite animation implementation and testing stage.
