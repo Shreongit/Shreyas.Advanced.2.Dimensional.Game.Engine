@@ -123,4 +123,6 @@ The development history also records **Stage 3 — Command, 2D Renderer, and GPU
 
 Stage 4.2.2 focused on implementing and validating texture UV offset and size selection in the SA2DGE sprite rendering pipeline, allowing the renderer to select specific regions of a texture instead of always using the entire image. We verified that all four quadrants of a texture could be selected correctly and confirmed that the UV selection system integrates with the existing sprite renderer without breaking rectangle rendering or sprite rotation functionality.
 
-**Stage 4.2.2 — Texture UV Selection: ✅ Complete**
+# Stage 4.2.3 — Animation Verification
+
+Verified animation pause, stop, non-looping playback, and frame timing. Pausing preserved the current frame, stopping reset playback to frame `0`, and non-looping playback stopped at frame `3`. A `1.1`-second update advanced two frames at `0.5` seconds per frame. Direct3D 11, the graphics pipeline, and shaders initialized successfully, and the engine shut down cleanly.
