@@ -27,7 +27,9 @@ public abstract class Renderer2D : Renderer
         int layer = 0,
         object? texture = null,
         bool flipHorizontal = false,
-        bool flipVertical = false)
+        bool flipVertical = false,
+        Vector2? uvOffset = null,
+        Vector2? uvSize = null)
     {
         Draw(
             RenderCommand.Sprite(
@@ -38,7 +40,10 @@ public abstract class Renderer2D : Renderer
                 layer,
                 texture,
                 flipHorizontal,
-                flipVertical));
+                flipVertical,
+                uvOffset,
+                uvSize));
+                
     }
 
     

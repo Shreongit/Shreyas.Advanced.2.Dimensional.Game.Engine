@@ -124,11 +124,11 @@ public override void Initialize()
 
             int index = (y * textureSize + x) * 4;
 
-            if (top && left) // Top-left: red
+            if (top && left) // Top-left: magenta
             {
                 pixels[index] = 255;
                 pixels[index + 1] = 0;
-                pixels[index + 2] = 0;
+                pixels[index + 2] = 255;
             }
             else if (top && !left) // Top-right: green
             {
@@ -363,61 +363,58 @@ public override void OnWindowEvent(
         $"({windowEvent.Width}x{windowEvent.Height})");
 }
 
+
+
 public override void Render()
 {
     Graphics!.Clear(
-        new Color(
-            20,
-            20,
-            30,
-            255));
+        new Color(20, 20, 30, 255));
 
     _renderer!.BeginFrame();
 
+    // Layer 0: Large red background rectangle.
     _renderer.DrawRectangle(
         new Vector2(640.0f, 360.0f),
         new Vector2(400.0f, 250.0f),
-        new Color(
-            255,
-            0,
-            0,
-            255));
-    // Layer 0: drawn first.
+        new Color(255, 0, 0, 255));
+
+    // Layer 0: Red rectangle.
     _renderer.DrawRectangle(
         new Vector2(500.0f, 300.0f),
         new Vector2(300.0f, 180.0f),
         new Color(1.0f, 0.0f, 0.0f, 1.0f),
         layer: 0);
 
-// Layer 1: drawn over the red rectangle.
+    // Layer 1: Green rectangle over the red rectangle.
     _renderer.DrawRectangle(
         new Vector2(500.0f, 300.0f),
         new Vector2(220.0f, 130.0f),
         new Color(0.0f, 1.0f, 0.0f, 1.0f),
         layer: 1);
 
-// Layer 2: rotated and drawn on top.
+    // Layer 2: Rotated blue rectangle.
     _renderer.DrawRectangle(
         new Vector2(500.0f, 300.0f),
         new Vector2(150.0f, 70.0f),
         new Color(0.0f, 0.0f, 1.0f, 1.0f),
         layer: 2,
         rotation: 0.785398f);
-    
-    
+
+    // Layer 3: Magenta top-left UV region of the test texture.
     _renderer.DrawSprite(
-        new Vector2(850.0f, 360.0f),
+        new Vector2(850.0f, 350.0f),
         new Vector2(180.0f, 180.0f),
         new Color(1.0f, 1.0f, 1.0f, 1.0f),
         layer: 3,
         texture: _testTexture,
-        flipHorizontal: true,
-        flipVertical: true);
-
+        uvOffset: new Vector2(0.0f, 0.0f),
+        uvSize: new Vector2(0.5f, 0.5f));
 
     _renderer.EndFrame();
     _renderer.Present();
 }
+
+
 
 public override void Shutdown()
 {

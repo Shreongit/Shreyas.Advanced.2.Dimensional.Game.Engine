@@ -9,6 +9,10 @@ public readonly struct RenderCommand
     public Vector2 Position { get; }
 
     public Vector2 Size { get; }
+    
+    public Vector2 UVOffset { get; }
+
+    public Vector2 UVSize { get; }
 
     public float Rotation { get; }
     
@@ -31,11 +35,15 @@ public readonly struct RenderCommand
         int layer = 0,
         object? resource = null,
         bool flipHorizontal = false,
-        bool flipVertical = false)
+        bool flipVertical = false,
+        Vector2? uvOffset = null,
+        Vector2? uvSize = null)
     {
         Type = type;
         Position = position;
         Size = size;
+        UVOffset = uvOffset ?? Vector2.Zero;
+        UVSize = uvSize ?? new Vector2(1.0f, 1.0f);
         Rotation = rotation;
         FlipHorizontal = flipHorizontal;
         FlipVertical = flipVertical;
@@ -52,7 +60,9 @@ public readonly struct RenderCommand
         int layer = 0,
         object? texture = null,
         bool flipHorizontal = false,
-        bool flipVertical = false)
+        bool flipVertical = false,
+        Vector2? uvOffset = null,
+        Vector2? uvSize = null)
     {
         return new RenderCommand(
             RenderCommandType.Sprite,
@@ -63,7 +73,9 @@ public readonly struct RenderCommand
             layer,
             texture,
             flipHorizontal,
-            flipVertical);
+            flipVertical,
+            uvOffset,
+            uvSize);
     }
 
     

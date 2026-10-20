@@ -36,6 +36,7 @@ public sealed class Direct3D11Renderer2D : Renderer2D
     private ConstantBuffer? _spriteTransformBuffer;
     private ConstantBuffer? _spriteColorBuffer;
     private ConstantBuffer? _spriteFlipBuffer;
+    private ConstantBuffer? _spriteUVBuffer;
 
     private bool _spritePipelineInitialized;
 
@@ -176,6 +177,9 @@ public sealed class Direct3D11Renderer2D : Renderer2D
         
         _spriteFlipBuffer?.Dispose();
         _spriteFlipBuffer = null;
+        
+        _spriteUVBuffer?.Dispose();
+        _spriteUVBuffer = null;
 
         _spriteTransformBuffer?.Dispose();
         _spriteTransformBuffer = null;
@@ -402,183 +406,196 @@ public sealed class Direct3D11Renderer2D : Renderer2D
     }
     
     
-    private void CreateSpritePipeline()
+    
+private void CreateSpritePipeline()
+{
+    if (_spritePipelineInitialized)
+        return;
+
+    if (_graphics.Resources is not GraphicsResources resources)
+        throw new InvalidOperationException(
+            "Graphics resources are not available.");
+
+    if (_graphics.Shaders is null)
+        throw new InvalidOperationException(
+            "Graphics shaders are not available.");
+
+    _spriteTransformBuffer =
+        resources.CreateConstantBuffer(64);
+
+    _spriteColorBuffer =
+        resources.CreateConstantBuffer(16);
+
+    _spriteFlipBuffer =
+        resources.CreateConstantBuffer(16);
+
+    _spriteUVBuffer =
+        resources.CreateConstantBuffer(16);
+
+    // Position (3 floats) + Color (4 floats) + UV (2 floats).
+    // Total stride: 36 bytes.
+
+    SpriteVertex[] vertices =
     {
-        if (_spritePipelineInitialized)
-            return;
+        // Top-left
+        new SpriteVertex(
+            -0.5f, -0.5f, 0.0f,
+            1.0f, 1.0f, 1.0f, 1.0f,
+            0.0f, 0.0f),
 
-        if (_graphics.Resources is not GraphicsResources resources)
-            throw new InvalidOperationException(
-                "Graphics resources are not available.");
+        // Top-right
+        new SpriteVertex(
+            0.5f, -0.5f, 0.0f,
+            1.0f, 1.0f, 1.0f, 1.0f,
+            1.0f, 0.0f),
 
-        if (_graphics.Shaders is null)
-            throw new InvalidOperationException(
-                "Graphics shaders are not available.");
+        // Bottom-left
+        new SpriteVertex(
+            -0.5f, 0.5f, 0.0f,
+            1.0f, 1.0f, 1.0f, 1.0f,
+            0.0f, 1.0f),
 
-        _spriteTransformBuffer =
-            resources.CreateConstantBuffer(64);
+        // Bottom-right
+        new SpriteVertex(
+            0.5f, 0.5f, 0.0f,
+            1.0f, 1.0f, 1.0f, 1.0f,
+            1.0f, 1.0f)
+    };
 
-        _spriteColorBuffer =
-            resources.CreateConstantBuffer(16);
-        
-        _spriteFlipBuffer =
-            resources.CreateConstantBuffer(16);
+    uint[] indices =
+    {
+        0, 1, 2,
+        2, 1, 3
+    };
 
-        // Position (3 floats) + Color (4 floats) + UV (2 floats).
-        // Total stride: 36 bytes.
-        
-        SpriteVertex[] vertices =
+    _spriteVertexBuffer =
+        _graphics.CreateVertexBuffer(vertices.Length, 36);
+    _spriteVertexBuffer.SetData(vertices);
+
+    _spriteIndexBuffer =
+        _graphics.CreateIndexBuffer(indices.Length);
+    _spriteIndexBuffer.SetData(indices);
+
+    _spriteVertexArray = _graphics.CreateVertexArray();
+    _spriteVertexArray.AddVertexBuffer(_spriteVertexBuffer);
+    _spriteVertexArray.SetIndexBuffer(_spriteIndexBuffer);
+
+    VertexLayout layout = new();
+
+    layout.Add(new VertexAttribute(
+        "POSITION", 0, VertexAttributeType.Float3, 0));
+
+    layout.Add(new VertexAttribute(
+        "COLOR", 0, VertexAttributeType.Float4, 12));
+
+    layout.Add(new VertexAttribute(
+        "TEXCOORD", 0, VertexAttributeType.Float2, 28));
+
+    const string vertexShaderSource = """
+        cbuffer TransformBuffer : register(b0)
         {
-            // Top-left
-            new SpriteVertex(
-                -0.5f, -0.5f, 0.0f,
-                1.0f, 1.0f, 1.0f, 1.0f,
-                0.0f, 0.0f),
-
-            // Top-right
-            new SpriteVertex(
-                0.5f, -0.5f, 0.0f,
-                1.0f, 1.0f, 1.0f, 1.0f,
-                1.0f, 0.0f),
-
-            // Bottom-left
-            new SpriteVertex(
-                -0.5f, 0.5f, 0.0f,
-                1.0f, 1.0f, 1.0f, 1.0f,
-                0.0f, 1.0f),
-
-            // Bottom-right
-            new SpriteVertex(
-                0.5f, 0.5f, 0.0f,
-                1.0f, 1.0f, 1.0f, 1.0f,
-                1.0f, 1.0f)
+            float4x4 Transform;
         };
 
-        uint[] indices =
+        cbuffer FlipBuffer : register(b1)
         {
-            0, 1, 2,
-            2, 1, 3
+            float4 FlipFlags;
         };
 
-        _spriteVertexBuffer =
-            _graphics.CreateVertexBuffer(vertices.Length, 36);
-        _spriteVertexBuffer.SetData(vertices);
+        cbuffer UVBuffer : register(b2)
+        {
+            float4 UVRegion;
+        };
 
-        _spriteIndexBuffer =
-            _graphics.CreateIndexBuffer(indices.Length);
-        _spriteIndexBuffer.SetData(indices);
+        struct VSInput
+        {
+            float3 Position : POSITION;
+            float4 Color : COLOR;
+            float2 TexCoord : TEXCOORD;
+        };
 
-        _spriteVertexArray = _graphics.CreateVertexArray();
-        _spriteVertexArray.AddVertexBuffer(_spriteVertexBuffer);
-        _spriteVertexArray.SetIndexBuffer(_spriteIndexBuffer);
+        struct VSOutput
+        {
+            float4 Position : SV_POSITION;
+            float4 Color : COLOR;
+            float2 TexCoord : TEXCOORD;
+        };
 
-        VertexLayout layout = new();
+        VSOutput main(VSInput input)
+        {
+            VSOutput output;
 
-        layout.Add(new VertexAttribute(
-            "POSITION", 0, VertexAttributeType.Float3, 0));
+            output.Position =
+                mul(float4(input.Position, 1.0f), Transform);
 
-        layout.Add(new VertexAttribute(
-            "COLOR", 0, VertexAttributeType.Float4, 12));
+            output.Color = input.Color;
 
-        layout.Add(new VertexAttribute(
-            "TEXCOORD", 0, VertexAttributeType.Float2, 28));
+            float2 uv = input.TexCoord;
 
-
-        
-
-        const string vertexShaderSource = """
-            cbuffer TransformBuffer : register(b0)
-            {
-                float4x4 Transform;
-            };
-            
-            cbuffer FlipBuffer : register(b1)
-            {
-                float4 FlipFlags;
-            };
-
-            struct VSInput
-            {
-                float3 Position : POSITION;
-                float4 Color : COLOR;
-                float2 TexCoord : TEXCOORD;
-            };
-
-            struct VSOutput
-            {
-                float4 Position : SV_POSITION;
-                float4 Color : COLOR;
-                float2 TexCoord : TEXCOORD;
-            };
-
-            VSOutput main(VSInput input)
-            {
-                VSOutput output;
-                output.Position = mul(float4(input.Position, 1.0f), Transform);
-                output.Color = input.Color;
-                float2 uv = input.TexCoord;
-            
             if (FlipFlags.x > 0.5f)
             {
                 uv.x = 1.0f - uv.x;
             }
-            
+
             if (FlipFlags.y > 0.5f)
             {
                 uv.y = 1.0f - uv.y;
             }
-            
+
+            uv = UVRegion.xy + uv * UVRegion.zw;
+
             output.TexCoord = uv;
-                return output;
-            }
-            """;
 
-        const string fragmentShaderSource = """
-            Texture2D SpriteTexture : register(t0);
-            SamplerState SpriteSampler : register(s0);
+            return output;
+        }
+        """;
 
-            cbuffer ColorBuffer : register(b0)
-            {
-                float4 Color;
-            };
+    const string fragmentShaderSource = """
+        Texture2D SpriteTexture : register(t0);
+        SamplerState SpriteSampler : register(s0);
 
-            struct PSInput
-            {
-                float4 Position : SV_POSITION;
-                float4 Color : COLOR;
-                float2 TexCoord : TEXCOORD;
-            };
+        cbuffer ColorBuffer : register(b0)
+        {
+            float4 Color;
+        };
 
-            float4 main(PSInput input) : SV_TARGET
-            {
-                return SpriteTexture.Sample(
-                    SpriteSampler, input.TexCoord) * input.Color * Color;
-            }
-            """;
+        struct PSInput
+        {
+            float4 Position : SV_POSITION;
+            float4 Color : COLOR;
+            float2 TexCoord : TEXCOORD;
+        };
 
-        _spriteVertexShader =
-            _graphics.CreateVertexShader(vertexShaderSource);
+        float4 main(PSInput input) : SV_TARGET
+        {
+            return SpriteTexture.Sample(
+                SpriteSampler, input.TexCoord) * input.Color * Color;
+        }
+        """;
 
-        _spriteFragmentShader =
-            _graphics.CreateFragmentShader(fragmentShaderSource);
+    _spriteVertexShader =
+        _graphics.CreateVertexShader(vertexShaderSource);
 
-        _spriteVertexShader.Compile();
-        _spriteFragmentShader.Compile();
+    _spriteFragmentShader =
+        _graphics.CreateFragmentShader(fragmentShaderSource);
 
-        _spriteVertexArray.SetLayout(
-            layout,
-            _spriteVertexShader.Bytecode.Span);
+    _spriteVertexShader.Compile();
+    _spriteFragmentShader.Compile();
 
-        _spriteShaderProgram = _graphics.CreateShaderProgram();
-        _spriteShaderProgram.Attach(_spriteVertexShader);
-        _spriteShaderProgram.Attach(_spriteFragmentShader);
-        _spriteShaderProgram.Link();
+    _spriteVertexArray.SetLayout(
+        layout,
+        _spriteVertexShader.Bytecode.Span);
 
-        _spritePipelineInitialized = true;
+    _spriteShaderProgram = _graphics.CreateShaderProgram();
+    _spriteShaderProgram.Attach(_spriteVertexShader);
+    _spriteShaderProgram.Attach(_spriteFragmentShader);
+    _spriteShaderProgram.Link();
 
-        Console.WriteLine("Sprite pipeline created.");
-        
-    }
+    _spritePipelineInitialized = true;
+
+    Console.WriteLine("Sprite pipeline created.");
+}
+
 
 
     
@@ -813,6 +830,25 @@ public sealed class Direct3D11Renderer2D : Renderer2D
             MemoryMarshal.AsBytes<float>(flipFlags);
 
         _spriteFlipBuffer.SetData(flipBytes);
+        
+        if (_spriteUVBuffer is null)
+        {
+            throw new InvalidOperationException(
+                "The sprite UV buffer is not initialized.");
+        }
+
+        float[] uvRegion =
+        {
+            command.UVOffset.X,
+            command.UVOffset.Y,
+            command.UVSize.X,
+            command.UVSize.Y
+        };
+
+        ReadOnlySpan<byte> uvBytes =
+            MemoryMarshal.AsBytes<float>(uvRegion);
+
+        _spriteUVBuffer.SetData(uvBytes);
 
         _graphics.Commands.SetVertexArray(_spriteVertexArray);
         _graphics.Commands.SetShaderProgram(_spriteShaderProgram);
@@ -834,6 +870,10 @@ public sealed class Direct3D11Renderer2D : Renderer2D
             _graphics.Commands.SetVertexConstantBuffer(
                 1,
                 _spriteFlipBuffer);
+
+            _graphics.Commands.SetVertexConstantBuffer(
+                2,
+                _spriteUVBuffer);
 
             _graphics.Commands.DrawIndexed(6);
         }
