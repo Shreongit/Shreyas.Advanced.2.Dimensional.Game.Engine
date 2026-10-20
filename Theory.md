@@ -187,3 +187,37 @@ Complete and verify the sprite animation system by testing playback controls, ma
 ## Outcome
 
 The sprite animation system's playback controls, manual frame navigation, looping boundaries, timer reset, and restart behaviour passed verification. This completes the current sprite animation implementation and testing stage.
+
+
+# Stage 4.3 — Animation-to-Rendering Integration
+
+## Objective
+
+Integrate sprite animation with the rendering pipeline and verify that animation states, playback controls, and keyboard input work correctly at runtime.
+
+## Core Concepts
+
+- **Animation-to-Rendering Integration:** Connects animation frame selection to the rendering system so the appropriate sprite frame can be displayed.
+- **Animation States:** Idle, Walk, and Run represent different animation states that can be selected through keyboard input.
+- **Playback Control:** Pause, play, stop, and restart manage animation playback and its current state.
+- **Frame Timing:** Controls how animation frames advance over elapsed time.
+- **Looping:** Allows an animation to repeat after reaching its final frame.
+- **Manual Frame Selection:** Enables direct selection of individual animation frames for testing and inspection.
+- **Runtime Integration:** Successful project builds and Direct3D 11 startup confirm that the integrated systems can initialize and run together.
+
+## Verification Results
+
+| Test | Result |
+|---|---|
+| Both projects compile successfully | Passed |
+| Direct3D 11 runtime startup | Passed |
+| Pause and stop behaviour | Passed |
+| Animation timing and looping | Passed |
+| Manual frame selection and restart | Passed |
+| Keyboard switching: Idle, Walk, Run | Verified |
+| Keyboard playback controls | Verified |
+
+## Outcome
+
+The animation system and rendering runtime were successfully integrated and tested. Animation playback behaviour and keyboard-driven state switching between Idle, Walk, and Run were verified.
+

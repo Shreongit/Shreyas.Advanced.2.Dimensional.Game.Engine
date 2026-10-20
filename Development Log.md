@@ -130,3 +130,7 @@ Verified animation pause, stop, non-looping playback, and frame timing. Pausing 
 # Stage 4.2.4 — Sprite Animation Controls and Verification
 
 Implemented and verified sprite animation playback controls, including play, pause, stop, restart, and looping. Added manual left/right frame navigation and confirmed sprite flipping, UV region selection, automatic frame advancement, and animation timing. All eight behaviour checks passed, including looping boundaries, timer reset, and restart behaviour.
+
+# Stage 4.3 — Animation-to-Rendering Integration
+
+Successfully built both projects and verified that the Direct3D 11 runtime starts correctly. Tested animation pause, stop, timing, looping, manual frame selection, and restart behaviour, with all tests passing. Keyboard input was verified for switching between Idle, Walk, and Run states, as well as controlling playback through pause, play, stop, and restart.
