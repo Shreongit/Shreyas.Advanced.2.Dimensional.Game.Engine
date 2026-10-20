@@ -124,6 +124,34 @@ The recorded validation checked all four texture quadrants and confirmed that UV
 
 The runtime runs the application and coordinates updates. The platform layer supplies the window and operating-system events. The input backend translates device state into engine-level queries. The graphics backend creates and manages D3D11 resources, configures rendering state, issues commands, and presents frames. Geometry rendering proves that vertices and shaders can reach the screen; textures and UVs make that geometry display selected image content; alpha blending allows transparent and semi-transparent pixels to combine correctly with the scene.
 
+# Stage 4.2.3 — Animation Playback Verification
+
+## Objective
+
+Verify that animation playback controls and frame timing behave as expected, and confirm that the engine initializes and shuts down cleanly while running the graphics pipeline.
+
+## Core Concepts
+
+- **Pause:** Suspends animation advancement while preserving the current frame, allowing playback to resume from the same point.
+- **Stop:** Ends playback and resets the animation to its starting frame (`0`).
+- **Non-looping playback:** Advances through the animation until the final frame, then stops instead of returning to the beginning.
+- **Frame timing:** Animation advancement depends on elapsed time and the configured duration per frame. At `0.5` seconds per frame, a `1.1`-second update advances two frames, leaving `0.1` seconds.
+- **Runtime lifecycle verification:** Successful Direct3D 11, graphics-pipeline, and shader initialization followed by clean shutdown confirms that the tested behavior runs within a functioning graphics runtime.
+
+## Verification Results
+
+| Test | Expected Behavior | Result |
+|---|---|---|
+| Pause | Preserve the current frame | Passed |
+| Stop | Reset to frame `0` | Passed |
+| Non-looping playback | Stop at frame `3` | Passed |
+| Frame timing | Advance two frames during a `1.1`-second update at `0.5` seconds per frame | Passed |
+| Runtime lifecycle | Initialize graphics resources and shut down cleanly | Passed |
+
+## Outcome
+
+The tested animation controls, non-looping behavior, and time-based frame advancement behaved as expected. The graphics runtime also initialized and shut down cleanly during verification.
+
 This is why the stages build on one another. A sprite renderer is not just a single drawing function: it depends on a working runtime, a window, input and event handling where needed, a graphics device, valid resources, shaders, draw commands, texture sampling, and correct rendering state.
 
 In SA2DGE, this functionality provides a foundation for **sprite sheets, animation frames, tile maps, and texture atlases**, where multiple images are stored in a single texture and selected using UV coordinates.
