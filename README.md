@@ -80,6 +80,10 @@ Read [`LICENSE`](LICENSE) for the full terms. Third-party dependencies remain su
 
 > **Important:** This repository's public visibility allows people to view and technically download or fork its contents. The license states the permitted and prohibited uses; it does not technically prevent copying. Previously granted rights under any earlier license may continue to apply to copies distributed under that license.
 
+### 🔒 What Does Proprietary License Mean?
+
+A proprietary license means that **SA2DGE is privately owned, and its source code is not free to copy, modify, redistribute, or use in other projects without explicit written permission.** The source code is publicly available for educational viewing and learning only. Public access does not grant ownership or usage rights. Any future official engine release will be governed by its own separate license.
+
 ---
 
 <div align="center">
