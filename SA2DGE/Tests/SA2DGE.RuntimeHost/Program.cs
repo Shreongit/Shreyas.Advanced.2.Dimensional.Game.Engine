@@ -55,6 +55,7 @@ internal sealed class RuntimeGame : Game
     private Texture2D? _testTexture;
     private SpriteSheet? _testSpriteSheet;
     private SpriteAnimation? _testAnimation;
+    private SpriteAnimationController? _animationController;
 
 
 public RuntimeGame()
@@ -171,12 +172,39 @@ public override void Initialize()
         columns: 2,
         rows: 2);
     
-    _testAnimation = new SpriteAnimation(
-        spriteSheet: _testSpriteSheet,
-        frameDuration: 0.5f,
-        loop: true);
+    _animationController = new SpriteAnimationController();
 
-    _testAnimation.Play();
+    _animationController.AddAnimation(
+        "Idle",
+        new SpriteAnimation(_testSpriteSheet, 0.8f, loop: true));
+
+    _animationController.AddAnimation(
+        "Walk",
+        new SpriteAnimation(_testSpriteSheet, 0.25f, loop: true));
+
+    _animationController.AddAnimation(
+        "Run",
+        new SpriteAnimation(_testSpriteSheet, 0.12f, loop: true));
+
+    _animationController.Play("Idle");
+
+    _testAnimation = _animationController.CurrentAnimation
+                     ?? throw new InvalidOperationException(
+                         "The animation controller failed to select the Idle animation.");
+
+    Console.WriteLine(
+        "Stage 4.2.5: Idle, Walk, and Run animations registered.");
+    
+    Console.WriteLine("Controls:");
+    Console.WriteLine("  1 = Idle animation");
+    Console.WriteLine("  2 = Walk animation");
+    Console.WriteLine("  3 = Run animation");
+    Console.WriteLine("  P = Play");
+    Console.WriteLine("  O = Pause");
+    Console.WriteLine("  K = Stop");
+    Console.WriteLine("  R = Restart");
+    Console.WriteLine("  L = Toggle looping");
+    Console.WriteLine("  Left / Right = Select frame");
 
     Console.WriteLine("Stage 3 checkerboard texture created.");
 
@@ -438,8 +466,8 @@ private void TestSpriteAnimation()
 
 public override void Update(float deltaTime)
 {
-    
-    _testAnimation?.Update(deltaTime);
+    _animationController?.Update(deltaTime);
+    _testAnimation = _animationController?.CurrentAnimation;
     
     if (_testAnimation is not null)
     {
@@ -511,28 +539,41 @@ public override void Update(float deltaTime)
             Console.WriteLine(
                 $"Animation: Frame {_testAnimation.CurrentFrame}");
         }
+        
+        if (_animationController is not null)
+        {
+            if (Input.Keyboard.IsPressed(InputKey.Number1))
+            {
+                _animationController.Play("Idle");
+                _testAnimation = _animationController.CurrentAnimation;
+                Console.WriteLine("Active animation: Idle");
+            }
+
+            if (Input.Keyboard.IsPressed(InputKey.Number2))
+            {
+                _animationController.Play("Walk");
+                _testAnimation = _animationController.CurrentAnimation;
+                Console.WriteLine("Active animation: Walk");
+            }
+
+            if (Input.Keyboard.IsPressed(InputKey.Number3))
+            {
+                _animationController.Play("Run");
+                _testAnimation = _animationController.CurrentAnimation;
+                Console.WriteLine("Active animation: Run");
+            }
+        }
+        
+        
     }
+    
+    
     if (Input.Mouse.DeltaX != 0.0f ||
         Input.Mouse.DeltaY != 0.0f)
     {
-        Console.WriteLine(
-            $"Mouse Move: X={Input.Mouse.X}, Y={Input.Mouse.Y}, " +
-            $"DeltaX={Input.Mouse.DeltaX}, DeltaY={Input.Mouse.DeltaY}");
-    }
-
-    if (Input.Mouse.IsPressed(MouseButton.Left))
-    {
-        Console.WriteLine("LEFT MOUSE PRESSED");
-    }
-
-    if (Input.Mouse.IsDown(MouseButton.Left))
-    {
-        Console.WriteLine("LEFT MOUSE HELD");
-    }
-
-    if (Input.Mouse.IsReleased(MouseButton.Left))
-    {
-        Console.WriteLine("LEFT MOUSE RELEASED");
+        //Console.WriteLine(
+            //$"Mouse Move: X={Input.Mouse.X}, Y={Input.Mouse.Y}, " +
+            //$"DeltaX={Input.Mouse.DeltaX}, DeltaY={Input.Mouse.DeltaY}");
     }
 
     if (Input.Keyboard.IsPressed(InputKey.Escape))

@@ -751,11 +751,11 @@ private void CreateSpritePipeline()
                 "The rectangle rendering pipeline is not initialized.");
         }
 
-        Console.WriteLine(
-            $"RECTANGLE DRAW: X={command.Position.X}, " +
-            $"Y={command.Position.Y}, " +
-            $"W={command.Size.X}, " +
-            $"H={command.Size.Y}");
+        // Console.WriteLine(
+            //$"RECTANGLE DRAW: X={command.Position.X}, " +
+            //$"Y={command.Position.Y}, " +
+            //$"W={command.Size.X}, " +
+            //$"H={command.Size.Y}");
 
         UpdateRectangleTransform(command);
         UpdateRectangleColor(command);

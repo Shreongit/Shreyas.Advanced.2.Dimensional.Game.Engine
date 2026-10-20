@@ -86,8 +86,8 @@ internal sealed class Direct3D11GraphicsBackend : GraphicsBackend
             throw new InvalidOperationException(
                 "The Direct3D 11 render target view is not initialized.");
 
-        Console.WriteLine(
-            $"CLEAR: R={color.R} G={color.G} B={color.B} A={color.A}");
+        //Console.WriteLine(
+            //$"CLEAR: R={color.R} G={color.G} B={color.B} A={color.A}");
 
         _context.OMSetRenderTargets(
             new ID3D11RenderTargetView[]
