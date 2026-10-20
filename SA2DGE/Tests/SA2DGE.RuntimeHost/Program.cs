@@ -53,6 +53,8 @@ internal sealed class RuntimeGame : Game
     private ShaderProgram? _shaderProgram;
     private Direct3D11Renderer2D? _renderer;
     private Texture2D? _testTexture;
+    private SpriteSheet? _testSpriteSheet;
+    private SpriteAnimation? _testAnimation;
 
 
 public RuntimeGame()
@@ -164,6 +166,17 @@ public override void Initialize()
         textureSize,
         TextureFormat.RGBA8,
         pixels);
+    
+    _testSpriteSheet = new SpriteSheet(
+        columns: 2,
+        rows: 2);
+    
+    _testAnimation = new SpriteAnimation(
+        spriteSheet: _testSpriteSheet,
+        frameDuration: 0.5f,
+        loop: true);
+
+    _testAnimation.Play();
 
     Console.WriteLine("Stage 3 checkerboard texture created.");
 
@@ -292,10 +305,80 @@ public override void Initialize()
 
     Console.WriteLine(
         "Stage 2.5 graphics resources initialized.");
+    
+    TestSpriteAnimation();
 }
+
+
+private void TestSpriteAnimation()
+{
+    if (_testSpriteSheet is null)
+    {
+        throw new InvalidOperationException(
+            "Sprite sheet must be initialized before testing.");
+    }
+
+    // Test 1: Pause preserves the current frame.
+    var pauseTest = new SpriteAnimation(
+        _testSpriteSheet, 0.5f);
+
+    pauseTest.Play();
+    pauseTest.Update(0.5f);
+
+    if (pauseTest.CurrentFrame != 1)
+        throw new Exception("FAIL: Frame advancement.");
+
+    pauseTest.Pause();
+    pauseTest.Update(1.0f);
+
+    if (pauseTest.CurrentFrame != 1 || pauseTest.IsPlaying)
+        throw new Exception("FAIL: Pause.");
+
+    Console.WriteLine("PASS: Pause preserves the current frame.");
+
+    // Test 2: Stop resets the animation.
+    pauseTest.Play();
+    pauseTest.Stop();
+
+    if (pauseTest.CurrentFrame != 0 || pauseTest.IsPlaying)
+        throw new Exception("FAIL: Stop.");
+
+    Console.WriteLine("PASS: Stop resets to frame 0.");
+
+    // Test 3: Non-looping playback stops on the last frame.
+    var nonLoopTest = new SpriteAnimation(
+        _testSpriteSheet,
+        frameDuration: 0.5f,
+        loop: false);
+
+    nonLoopTest.Play();
+    nonLoopTest.Update(2.0f);
+
+    if (nonLoopTest.CurrentFrame != 3 || nonLoopTest.IsPlaying)
+        throw new Exception("FAIL: Non-looping playback.");
+
+    Console.WriteLine("PASS: Non-looping playback stops on the last frame.");
+
+    // Test 4: A large delta advances multiple frames.
+    var timingTest = new SpriteAnimation(
+        _testSpriteSheet, 0.5f);
+
+    timingTest.Play();
+    timingTest.Update(1.1f);
+
+    if (timingTest.CurrentFrame != 2)
+        throw new Exception("FAIL: Multi-frame timing.");
+
+    Console.WriteLine("PASS: 1.1 seconds advances two frames.");
+
+    Console.WriteLine("All SpriteAnimation tests passed.");
+}
+
 
 public override void Update(float deltaTime)
 {
+    
+    _testAnimation?.Update(deltaTime);
     if (Input.Mouse.DeltaX != 0.0f ||
         Input.Mouse.DeltaY != 0.0f)
     {
@@ -401,14 +484,18 @@ public override void Render()
         rotation: 0.785398f);
 
     // Layer 3: Magenta top-left UV region of the test texture.
-    _renderer.DrawSprite(
-        new Vector2(850.0f, 350.0f),
-        new Vector2(180.0f, 180.0f),
-        new Color(1.0f, 1.0f, 1.0f, 1.0f),
-        layer: 3,
-        texture: _testTexture,
-        uvOffset: new Vector2(0.0f, 0.0f),
-        uvSize: new Vector2(0.5f, 0.5f));
+    
+    if (_testAnimation is not null)
+    {
+        _renderer.DrawSpriteFrame(
+            position: new Vector2(850.0f, 350.0f),
+            size: new Vector2(180.0f, 180.0f),
+            color: new Color(1.0f, 1.0f, 1.0f, 1.0f),
+            texture: _testTexture,
+            spriteSheet: _testAnimation.SpriteSheet,
+            frameIndex: _testAnimation.CurrentFrame,
+            layer: 3);
+    }
 
     _renderer.EndFrame();
     _renderer.Present();

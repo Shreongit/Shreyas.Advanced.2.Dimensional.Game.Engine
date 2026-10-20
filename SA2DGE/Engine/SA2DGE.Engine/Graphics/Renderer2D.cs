@@ -45,6 +45,38 @@ public abstract class Renderer2D : Renderer
                 uvSize));
                 
     }
+    
+    
+    public void DrawSpriteFrame(
+        Vector2 position,
+        Vector2 size,
+        Color color,
+        object? texture,
+        SpriteSheet spriteSheet,
+        int frameIndex,
+        float rotation = 0.0f,
+        int layer = 0,
+        bool flipHorizontal = false,
+        bool flipVertical = false)
+    {
+        ArgumentNullException.ThrowIfNull(spriteSheet);
+
+        Vector2 uvOffset =
+            spriteSheet.GetFrameUVOffset(frameIndex);
+
+        DrawSprite(
+            position,
+            size,
+            color,
+            rotation,
+            layer,
+            texture,
+            flipHorizontal,
+            flipVertical,
+            uvOffset,
+            spriteSheet.FrameUVSize);
+    }
+
 
     
     public void DrawRectangle(
