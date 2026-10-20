@@ -126,3 +126,7 @@ Stage 4.2.2 focused on implementing and validating texture UV offset and size se
 # Stage 4.2.3 — Animation Verification
 
 Verified animation pause, stop, non-looping playback, and frame timing. Pausing preserved the current frame, stopping reset playback to frame `0`, and non-looping playback stopped at frame `3`. A `1.1`-second update advanced two frames at `0.5` seconds per frame. Direct3D 11, the graphics pipeline, and shaders initialized successfully, and the engine shut down cleanly.
+
+# Stage 4.2.4 — Sprite Animation Controls and Verification
+
+Implemented and verified sprite animation playback controls, including play, pause, stop, restart, and looping. Added manual left/right frame navigation and confirmed sprite flipping, UV region selection, automatic frame advancement, and animation timing. All eight behaviour checks passed, including looping boundaries, timer reset, and restart behaviour.
