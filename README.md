@@ -4,7 +4,7 @@
 
 # 🎮 SA2DGE
 
-### Shreyas's Advanced 2D Game Engine
+### Shreyas's Advanced 2 Dimensional Game Engine
 
 **A custom 2D game engine built from scratch in C#.**
 
