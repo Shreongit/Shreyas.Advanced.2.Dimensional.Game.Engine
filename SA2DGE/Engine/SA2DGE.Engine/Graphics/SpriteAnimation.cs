@@ -66,6 +66,16 @@ public sealed class SpriteAnimation
         CurrentFrame = 0;
         _elapsedTime = 0.0f;
     }
+    
+    /// <summary>
+    /// Restarts playback from the first frame.
+    /// </summary>
+    public void Restart()
+    {
+        CurrentFrame = 0;
+        _elapsedTime = 0.0f;
+        IsPlaying = true;
+    }
 
     /// <summary>
     /// Selects a frame manually and resets its elapsed time.

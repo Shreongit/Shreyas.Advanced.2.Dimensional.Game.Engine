@@ -372,6 +372,67 @@ private void TestSpriteAnimation()
     Console.WriteLine("PASS: 1.1 seconds advances two frames.");
 
     Console.WriteLine("All SpriteAnimation tests passed.");
+    
+    // Test 5: Manual frame selection resets elapsed time.
+    var manualTest = new SpriteAnimation(_testSpriteSheet, 0.5f);
+    manualTest.Play();
+    manualTest.Update(0.3f);
+    manualTest.SetFrame(2);
+    manualTest.Update(0.2f);
+
+    if (manualTest.CurrentFrame != 2)
+        throw new Exception("FAIL: Manual frame selection timer reset.");
+
+    Console.WriteLine("PASS: Manual frame selection resets elapsed time.");
+
+// Test 6: Looping advances from the last frame to frame 0.
+    var loopTest = new SpriteAnimation(
+        _testSpriteSheet,
+        frameDuration: 0.5f,
+        loop: true);
+
+    loopTest.SetFrame(3);
+    loopTest.Play();
+    loopTest.Update(0.5f);
+
+    if (loopTest.CurrentFrame != 0 || !loopTest.IsPlaying)
+        throw new Exception("FAIL: Looping frame boundary.");
+
+    Console.WriteLine("PASS: Looping wraps from the last frame to frame 0.");
+
+// Test 7: Non-looping playback stays on the last frame.
+    var boundaryTest = new SpriteAnimation(
+        _testSpriteSheet,
+        frameDuration: 0.5f,
+        loop: false);
+
+    boundaryTest.SetFrame(3);
+    boundaryTest.Play();
+    boundaryTest.Update(0.5f);
+
+    if (boundaryTest.CurrentFrame != 3 || boundaryTest.IsPlaying)
+        throw new Exception("FAIL: Non-looping frame boundary.");
+
+    Console.WriteLine("PASS: Non-looping playback stops at the last frame.");
+
+// Test 8: Restart resets the frame and starts playback.
+    var restartTest = new SpriteAnimation(_testSpriteSheet, 0.5f);
+    restartTest.SetFrame(2);
+    restartTest.Play();
+    restartTest.Update(0.3f);
+    restartTest.Restart();
+
+    if (restartTest.CurrentFrame != 0 || !restartTest.IsPlaying)
+        throw new Exception("FAIL: Restart state.");
+
+    restartTest.Update(0.2f);
+
+    if (restartTest.CurrentFrame != 0)
+        throw new Exception("FAIL: Restart did not reset elapsed time.");
+
+    Console.WriteLine("PASS: Restart resets frame, timer, and playback state.");
+
+    Console.WriteLine("All SpriteAnimation behaviour tests passed.");
 }
 
 
@@ -379,6 +440,78 @@ public override void Update(float deltaTime)
 {
     
     _testAnimation?.Update(deltaTime);
+    
+    if (_testAnimation is not null)
+    {
+        if (Input.Keyboard.IsPressed(InputKey.P))
+        {
+            _testAnimation.Play();
+            Console.WriteLine("Animation: Playing");
+        }
+
+        if (Input.Keyboard.IsPressed(InputKey.O))
+        {
+            _testAnimation.Pause();
+            Console.WriteLine("Animation: Paused");
+        }
+
+        if (Input.Keyboard.IsPressed(InputKey.K))
+        {
+            _testAnimation.Stop();
+            Console.WriteLine("Animation: Stopped at frame 0");
+        }
+
+        if (Input.Keyboard.IsPressed(InputKey.R))
+        {
+            _testAnimation.Restart();
+            Console.WriteLine("Animation: Restarted");
+        }
+
+        if (Input.Keyboard.IsPressed(InputKey.L))
+        {
+            _testAnimation.Loop = !_testAnimation.Loop;
+            Console.WriteLine(
+                $"Animation: Looping = {_testAnimation.Loop}");
+        }
+        
+        if (Input.Keyboard.IsPressed(InputKey.Left))
+        {
+            _testAnimation.Pause();
+
+            int previousFrame = _testAnimation.CurrentFrame - 1;
+
+            if (previousFrame < 0)
+            {
+                previousFrame = _testAnimation.Loop
+                    ? _testAnimation.SpriteSheet.FrameCount - 1
+                    : 0;
+            }
+
+            _testAnimation.SetFrame(previousFrame);
+
+            Console.WriteLine(
+                $"Animation: Frame {_testAnimation.CurrentFrame}");
+        }
+
+        if (Input.Keyboard.IsPressed(InputKey.Right))
+        {
+            _testAnimation.Pause();
+
+            int nextFrame = _testAnimation.CurrentFrame + 1;
+
+            if (nextFrame >= _testAnimation.SpriteSheet.FrameCount)
+            {
+                nextFrame = _testAnimation.Loop
+                    ? 0
+                    : _testAnimation.SpriteSheet.FrameCount - 1;
+            }
+
+            _testAnimation.SetFrame(nextFrame);
+
+            Console.WriteLine(
+                $"Animation: Frame {_testAnimation.CurrentFrame}");
+        }
+    }
     if (Input.Mouse.DeltaX != 0.0f ||
         Input.Mouse.DeltaY != 0.0f)
     {
