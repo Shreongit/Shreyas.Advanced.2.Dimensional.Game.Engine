@@ -1,4 +1,4 @@
-# 📘 SA2DGE — Stage-by-Stage Theory Notes (Stages 2.1–4.1.1)
+# 📘 SA2DGE — Stage by Stage Theory Notes
 
 These notes explain the main concepts behind the SA2DGE development stages in order. Each stage builds on the previous one: the runtime gives the engine a lifecycle, the platform layer connects it to Windows, input lets it read player actions, the graphics backend communicates with the GPU, and the renderer turns geometry and textures into visible pixels.
 
