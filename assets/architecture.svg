@@ -1,0 +1,93 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 710" width="800" height="710" role="img" aria-label="SA2DGE rendering flow">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#0f1420"/>
+      <stop offset="1" stop-color="#0a0d14"/>
+    </linearGradient>
+    <linearGradient id="purple" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#6d4de6"/>
+      <stop offset="1" stop-color="#4a2fb8"/>
+    </linearGradient>
+    <linearGradient id="slate" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#2a3350"/>
+      <stop offset="1" stop-color="#1c2338"/>
+    </linearGradient>
+    <linearGradient id="blue" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#1b8cf0"/>
+      <stop offset="1" stop-color="#0b5cb5"/>
+    </linearGradient>
+    <linearGradient id="teal" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#14b8a6"/>
+      <stop offset="1" stop-color="#0b7f73"/>
+    </linearGradient>
+    <linearGradient id="green" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#34d058"/>
+      <stop offset="1" stop-color="#1f9a3d"/>
+    </linearGradient>
+    <marker id="arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0 0 L10 5 L0 10 z" fill="#8b9bc4"/>
+    </marker>
+    <style>
+      text { font-family: 'Segoe UI', 'Helvetica Neue', Arial, sans-serif; }
+      .title { fill: #ffffff; font-size: 16px; font-weight: 700; text-anchor: middle; }
+      .sub { fill: #d6defa; font-size: 11.5px; text-anchor: middle; opacity: .85; }
+      .tag { fill: #8b9bc4; font-size: 11px; font-weight: 700; letter-spacing: 3px; text-anchor: middle; }
+      .head { fill: #ffffff; font-size: 13px; font-weight: 700; letter-spacing: 4px; text-anchor: middle; }
+      .box { stroke: rgba(255,255,255,.18); stroke-width: 1; }
+      .link { stroke: #8b9bc4; stroke-width: 2; fill: none; marker-end: url(#arrow); }
+    </style>
+  </defs>
+
+  <rect x="1" y="1" width="798" height="708" rx="18" fill="url(#bg)" stroke="#2b3350" stroke-width="2"/>
+  <text x="400" y="34" class="head">SA2DGE · RENDERING FLOW</text>
+
+  <!-- Game -->
+  <rect x="270" y="56" width="260" height="46" rx="12" class="box" fill="url(#purple)"/>
+  <text x="400" y="84" class="title">Game / Application</text>
+  <line x1="400" y1="102" x2="400" y2="126" class="link"/>
+
+  <!-- Runtime -->
+  <rect x="270" y="128" width="260" height="46" rx="12" class="box" fill="url(#slate)"/>
+  <text x="400" y="149" class="title">Engine Runtime</text>
+  <text x="400" y="165" class="sub">Lifecycle · Coordination</text>
+  <line x1="400" y1="174" x2="400" y2="196" class="link"/>
+
+  <!-- Game loop -->
+  <rect x="270" y="198" width="260" height="46" rx="12" class="box" fill="url(#slate)"/>
+  <text x="400" y="219" class="title">Game Loop</text>
+  <text x="400" y="235" class="sub">Update · Render · Present</text>
+  <line x1="400" y1="244" x2="400" y2="266" class="link"/>
+
+  <!-- Platform layer -->
+  <rect x="90" y="268" width="620" height="108" rx="16" fill="#121a2c" stroke="#2f3b61" stroke-width="1.5" stroke-dasharray="6 5"/>
+  <text x="400" y="289" class="tag">PLATFORM LAYER</text>
+  <rect x="120" y="302" width="270" height="56" rx="12" class="box" fill="url(#teal)"/>
+  <text x="255" y="326" class="title">Input</text>
+  <text x="255" y="344" class="sub">Keyboard · Mouse · Gamepad (XInput)</text>
+  <rect x="410" y="302" width="270" height="56" rx="12" class="box" fill="url(#teal)"/>
+  <text x="545" y="326" class="title">Window</text>
+  <text x="545" y="344" class="sub">Native Win32 window</text>
+  <line x1="400" y1="376" x2="400" y2="402" class="link"/>
+
+  <!-- Graphics backend -->
+  <rect x="250" y="404" width="300" height="54" rx="12" class="box" fill="url(#blue)"/>
+  <text x="400" y="428" class="title">Graphics Backend</text>
+  <text x="400" y="446" class="sub">Direct3D 11 / DXGI · Vortice</text>
+  <line x1="400" y1="458" x2="400" y2="484" class="link"/>
+
+  <!-- GPU resources -->
+  <rect x="250" y="486" width="300" height="46" rx="12" class="box" fill="url(#blue)"/>
+  <text x="400" y="507" class="title">GPU Resources &amp; Pipeline</text>
+  <text x="400" y="523" class="sub">Buffers · Shaders · Textures · State</text>
+  <line x1="400" y1="532" x2="400" y2="558" class="link"/>
+
+  <!-- Renderer -->
+  <rect x="250" y="560" width="300" height="54" rx="12" class="box" fill="url(#purple)"/>
+  <text x="400" y="584" class="title">Renderer</text>
+  <text x="400" y="602" class="sub">Geometry · Sprites · 2D content</text>
+  <line x1="400" y1="614" x2="400" y2="640" class="link"/>
+
+  <!-- Frame -->
+  <rect x="270" y="642" width="260" height="46" rx="23" class="box" fill="url(#green)"/>
+  <text x="400" y="670" class="title">Presented Frame</text>
+</svg>

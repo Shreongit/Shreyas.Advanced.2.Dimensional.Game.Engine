@@ -1,0 +1,54 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 170" width="900" height="170" role="img" aria-label="Development cycle: Understand, Design, Implement, Test, Integrate">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#0f1420"/>
+      <stop offset="1" stop-color="#0a0d14"/>
+    </linearGradient>
+    <linearGradient id="s1" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#6d4de6"/><stop offset="1" stop-color="#4a2fb8"/></linearGradient>
+    <linearGradient id="s2" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#1b8cf0"/><stop offset="1" stop-color="#0b5cb5"/></linearGradient>
+    <linearGradient id="s3" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#14b8a6"/><stop offset="1" stop-color="#0b7f73"/></linearGradient>
+    <linearGradient id="s4" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#f59e0b"/><stop offset="1" stop-color="#b45f06"/></linearGradient>
+    <linearGradient id="s5" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#34d058"/><stop offset="1" stop-color="#1f9a3d"/></linearGradient>
+    <marker id="arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0 0 L10 5 L0 10 z" fill="#8b9bc4"/>
+    </marker>
+    <style>
+      text { font-family: 'Segoe UI', 'Helvetica Neue', Arial, sans-serif; }
+      .num { fill: #ffffffcc; font-size: 11px; font-weight: 700; letter-spacing: 2px; text-anchor: middle; }
+      .lbl { fill: #ffffff; font-size: 17px; font-weight: 700; text-anchor: middle; }
+      .loop { fill: #8b9bc4; font-size: 11px; letter-spacing: 3px; font-weight: 700; text-anchor: middle; }
+      .box { stroke: rgba(255,255,255,.18); stroke-width: 1; }
+      .link { stroke: #8b9bc4; stroke-width: 2; fill: none; marker-end: url(#arrow); }
+    </style>
+  </defs>
+
+  <rect x="1" y="1" width="898" height="168" rx="18" fill="url(#bg)" stroke="#2b3350" stroke-width="2"/>
+
+  <rect x="30" y="30" width="140" height="64" rx="12" class="box" fill="url(#s1)"/>
+  <text x="100" y="54" class="num">STEP 01</text>
+  <text x="100" y="78" class="lbl">Understand</text>
+
+  <rect x="200" y="30" width="140" height="64" rx="12" class="box" fill="url(#s2)"/>
+  <text x="270" y="54" class="num">STEP 02</text>
+  <text x="270" y="78" class="lbl">Design</text>
+
+  <rect x="370" y="30" width="140" height="64" rx="12" class="box" fill="url(#s3)"/>
+  <text x="440" y="54" class="num">STEP 03</text>
+  <text x="440" y="78" class="lbl">Implement</text>
+
+  <rect x="540" y="30" width="140" height="64" rx="12" class="box" fill="url(#s4)"/>
+  <text x="610" y="54" class="num">STEP 04</text>
+  <text x="610" y="78" class="lbl">Test</text>
+
+  <rect x="710" y="30" width="160" height="64" rx="12" class="box" fill="url(#s5)"/>
+  <text x="790" y="54" class="num">STEP 05</text>
+  <text x="790" y="78" class="lbl">Integrate</text>
+
+  <line x1="170" y1="62" x2="198" y2="62" class="link"/>
+  <line x1="340" y1="62" x2="368" y2="62" class="link"/>
+  <line x1="510" y1="62" x2="538" y2="62" class="link"/>
+  <line x1="680" y1="62" x2="708" y2="62" class="link"/>
+
+  <path d="M790 94 V128 H100 V98" class="link" stroke-dasharray="6 5"/>
+  <text x="445" y="148" class="loop">NEXT LAYER</text>
+</svg>
