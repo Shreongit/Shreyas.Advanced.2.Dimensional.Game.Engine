@@ -1,50 +1,91 @@
+<div align="center">
+
 # 🎮 SA2DGE
 
-## Shreyas's Advanced 2 Dimensional Game Engine
+### Shreyas's Advanced 2D Game Engine
 
-SA2DGE, short for **Shreyas's Advanced 2 Dimensional Game Engine**, is a personal 2D game engine being built from scratch in **C#** with the primary purpose of understanding how a game engine works internally rather than simply using an existing engine as a black box. The project focuses on learning and implementing the fundamental technologies that allow a game to communicate with the operating system, process player input, manage time and game updates, communicate with the GPU, organize graphics resources, render 2D content, manage game objects and scenes, and eventually provide higher-level systems that make building a complete game possible.
+**A custom 2D game engine built from scratch in C#.**
 
-A 2D game engine can be thought of as the software layer that sits between a game and the underlying computer system. Instead of the game directly communicating with Windows, handling native window messages, reading hardware input, creating GPU resources, compiling shaders, and issuing graphics commands, the engine provides organized systems that perform these responsibilities and expose simpler interfaces to the game. A game can therefore focus on describing what it wants to happen while the engine handles the lower-level work required to make that happen.
+*Understand the systems. Build the engine. Learn how games work under the hood.*
 
-At its core, SA2DGE follows the idea of separating the **game layer**, the **engine layer**, the **platform layer**, and the **hardware/API layer**. The game communicates with engine systems such as input, timing, rendering, resources, scenes, and physics, while the engine communicates with platform abstractions for things such as windows and input, and platform-specific implementations translate those abstractions into operating-system APIs such as Win32 and graphics APIs such as Direct3D 11. This separation allows the higher-level engine code to remain independent from many of the details of the operating system and graphics API.
+![Status](https://img.shields.io/badge/Project-In_Development-orange)
+![Language](https://img.shields.io/badge/Language-C%23-512BD4)
+![License](https://img.shields.io/badge/License-Proprietary-red)
 
-The basic operation of SA2DGE begins when the application starts the engine and initializes the required systems. The engine creates and manages the runtime, establishes the platform window, initializes input and graphics, and then enters the game loop. During each iteration of the game loop, the engine processes operating-system events, updates input states, advances the game using the configured timestep, allows the game to update its logic, and then performs rendering through the graphics system before presenting the completed frame to the screen. This process continuously repeats until the application receives a shutdown request, after which the engine shuts down its systems and releases the resources it owns.
-
-The platform layer is responsible for connecting SA2DGE to the operating system while keeping those operating-system details away from the rest of the engine. On Windows, this means the platform implementation communicates with the Win32 API to create and manage the native application window, process native window messages, detect resizing and other window events, and provide the engine with the information it needs without requiring game code to understand Win32 directly. The same principle is used for input, where Windows-specific keyboard, mouse, and gamepad APIs are translated into SA2DGE's own input abstractions.
-
-The graphics side of the engine follows a similar separation. SA2DGE provides a graphics abstraction that represents operations such as creating GPU resources, clearing the framebuffer, selecting rendering resources, issuing draw commands, resizing graphics resources, and presenting frames, while the Direct3D 11 backend performs the actual communication with the GPU. This allows the engine's renderer to work with concepts such as vertex buffers, index buffers, vertex arrays, textures, shaders, and graphics commands without requiring every higher-level system to directly manipulate Direct3D 11 objects.
-
-The rendering process eventually takes game data such as the position, size, texture, and transformation of a 2D object and converts that information into GPU-readable resources and commands. Geometry is stored in vertex and index buffers, vertex layouts describe how that data should be interpreted, shaders define how vertices and pixels are processed, textures provide image data, and graphics commands submit the required operations to the GPU. The GPU processes this information through the graphics pipeline and produces pixels in the render target, after which the swap chain presents the rendered image to the application window.
-
-SA2DGE is being designed as a layered system because a game engine is not a single piece of software but a collection of cooperating subsystems. The runtime controls execution, the platform layer communicates with the operating system, the input system converts hardware input into engine-level state, the graphics system communicates with the GPU, the renderer turns game data into drawing commands, and higher-level systems such as scenes, entities, resources, physics, animation, audio, and UI build upon these foundations to provide the functionality required by an actual game.
-
-The long-term purpose of SA2DGE is therefore not simply to produce a library that can draw sprites, but to build a complete understanding of the relationship between a game, an engine, an operating system, and computer hardware. The project is being developed from the low-level foundations upward so that each abstraction is backed by an understanding of what happens underneath it, allowing the engine to gradually move from runtime and platform infrastructure toward actual game-facing functionality.
-
-SA2DGE is currently designed around **C# and .NET**, with **Windows and Win32** providing the initial platform layer and **Direct3D 11 through Vortice** providing the graphics backend. These technologies form the current implementation foundation, while the architecture is being kept sufficiently separated so that platform- and graphics-specific code can remain isolated from the higher-level engine systems wherever practical.
-
-The project is intentionally being developed incrementally, with each subsystem being understood, implemented, connected to the runtime, tested, and refined before the engine moves further upward. The goal is to eventually reach a point where creating a 2D game with SA2DGE feels simple at the game level while the engine underneath it handles the complex work of window management, input, timing, graphics, resources, rendering, scenes, physics, audio, and other supporting systems.
-
-**SA2DGE is ultimately an attempt to build a 2D game engine while simultaneously understanding the engineering principles behind one — from the moment the application starts, through the game loop and platform layer, through input and GPU communication, all the way to the final pixels appearing on the screen.**
-
-
-## 🛠️ Development Path
-
-SA2DGE is being developed from the lowest-level runtime foundations toward higher-level 2D game development systems. The development path begins with the core runtime and game loop, then moves through platform and window management, input, graphics and rendering, mathematics, resources, scenes and entities, ECS architecture, physics, animation, audio, UI, serialization, and eventually development tools and editor functionality. Each system is built on top of the foundations below it, allowing the engine to gradually evolve from a low-level runtime into a complete 2D game development framework.
-
-**Development Path:**  
-🎮 Game → ⚙️ Runtime → 🧠 Core → 🖥️ Platform → 🪟 Window → 🎮 Input → 🎨 Graphics → 🖌️ Renderer → 📐 Math → 📦 Resources → 🌍 Scene → 🧩 ECS → 💥 Physics → 🎞️ Animation → 🔊 Audio → 🖱️ UI → 💾 Serialization → 🛠️ Tools
+</div>
 
 ---
 
-## 💻 Technology Stack
+## 🧭 What Is SA2DGE?
 
-SA2DGE is currently being developed primarily with **C# and .NET**, providing the main language, runtime, project system, and development environment for the engine. The initial platform target is **Windows**, with the native **Win32 API** being used for window creation, window messages, platform events, and Windows-specific input functionality. The graphics backend is built around **Direct3D 11**, with **Vortice** providing the .NET bindings that allow C# code to communicate with Direct3D 11 and DXGI. **XInput** is used for the initial Windows gamepad implementation, while the engine's own abstractions keep these platform-specific technologies separated from higher-level game and engine code.
+SA2DGE is a modular 2D game engine project focused on understanding and implementing the systems that make a game engine work. It is being built subsystem by subsystem, from the application lifecycle and input handling to the graphics backend and sprite rendering.
 
-**Current Stack:**  
-`C#` → `.NET` → `Win32` → `Direct3D 11 / DXGI` → `Vortice` → `XInput`
+The goal is to create a foundation on which 2D games can eventually be built, while keeping the engine architecture understandable, testable, and modular.
+
+## 🏗️ Engine Architecture
+
+The diagram below shows the high-level rendering flow through SA2DGE.
+
+```mermaid
+flowchart TD
+    A(["🎮 Game / Application"]) --> B["⚙️ Engine Runtime"]
+    B --> C["🔄 Game Loop"]
+    C --> D["🪟 Platform Layer"]
+    D --> E["⌨️ Keyboard · 🖱️ Mouse · 🎮 Gamepad"]
+    D --> F["🖥️ Window / Win32"]
+    E --> G["🎨 Graphics Backend"]
+    F --> G
+    G --> H["Direct3D 11 / DXGI"]
+    H --> I["🧩 GPU Resources & Pipeline"]
+    I --> J["🖌️ Renderer"]
+    J --> K(["🖥️ Presented Frame"])
+```
+
+### 🔍 How It Works
+
+1. **Runtime:** Starts the engine, manages its lifecycle, and coordinates the game loop.
+2. **Platform:** Connects the engine to Windows, manages the native window, and processes input.
+3. **Graphics backend:** Creates and manages GPU resources and sends rendering commands through Direct3D 11.
+4. **Renderer:** Uses geometry, shaders, textures, and rendering state to draw 2D content.
+5. **Presentation:** The completed frame is presented to the application window.
+
+## 🧰 Technology Stack
+
+| Area | Technology |
+|---|---|
+| Language | C# |
+| Runtime | .NET 10 |
+| Operating-system integration | Windows / Win32 |
+| Graphics API | Direct3D 11 / DXGI |
+| Graphics bindings | Vortice |
+| Gamepad input | XInput |
+| Version control | Git / GitHub |
+
+## 🛠️ Development Principles
+
+SA2DGE is developed in small, testable steps. Each subsystem is understood, designed, implemented, tested, and connected to the rest of the engine before the next layer is built.
+
+The current foundation includes the runtime, window and input backends, D3D11 graphics resources, basic geometry rendering, and early 2D texture and sprite-rendering functionality. The architecture will continue to evolve as new engine systems are added.
+
+## ⚠️ Educational Use Only — No Copying Allowed
+
+This repository is **public for educational viewing and technical study**. You may inspect the source code to understand the engine's architecture, logic, mathematics, and general programming concepts.
+
+- ✅ **Permitted:** View and study the publicly available source code to learn how the engine is structured.
+- ❌ **Not permitted without prior written permission:** Copying or reproducing the source code, copy-pasting it into another project, modifying it, redistributing it, or incorporating it into another engine, game, library, or product.
+
+**Viewing the source does not grant permission to use SA2DGE as a game engine.** If an official compiled release is published for Windows, macOS, or another platform, use of that release will be governed by its separate license or end-user terms.
+
+Read [`LICENSE`](LICENSE) for the full terms. Third-party dependencies remain subject to their own licenses.
+
+> **Important:** This repository's public visibility allows people to view and technically download or fork its contents. The license states the permitted and prohibited uses; it does not technically prevent copying. Previously granted rights under any earlier license may continue to apply to copies distributed under that license.
 
 ---
 
-## 📖 Development Log
+<div align="center">
 
-The main README intentionally describes **what SA2DGE is, what it is designed to do, and how the engine works at a high level**, rather than documenting every implementation milestone. If you want to see what was built, changed, fixed, tested, and validated during each development stage, please refer to the **Development Log**, where the progress of SA2DGE is documented stage by stage it helps to understand the real work behind the project.
+**SA2DGE — Shreyas's Advanced 2D Game Engine**
+
+*Built to understand the technology behind 2D games.*
+
+</div>
