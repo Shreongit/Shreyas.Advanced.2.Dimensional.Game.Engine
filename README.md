@@ -45,25 +45,9 @@ The goal is a solid foundation on which 2D games can eventually be built, while 
 
 The diagram below shows the high-level rendering flow through SA2DGE.
 
-```mermaid
-flowchart TD
-    A(["🎮 Game / Application"]) --> B["⚙️ Engine Runtime"]
-    B --> C["🔄 Game Loop"]
-    C --> D["🪟 Platform Layer"]
-    D --> E["⌨️ Keyboard · 🖱️ Mouse · 🎮 Gamepad"]
-    D --> F["🖥️ Window / Win32"]
-    E --> G["🎨 Graphics Backend"]
-    F --> G
-    G --> H["Direct3D 11 / DXGI"]
-    H --> I["🧩 GPU Resources & Pipeline"]
-    I --> J["🖌️ Renderer"]
-    J --> K(["🖥️ Presented Frame"])
-
-    style A fill:#512BD4,stroke:#2d1a7a,color:#fff
-    style K fill:#2ea44f,stroke:#1a6b31,color:#fff
-    style G fill:#0078D4,stroke:#00508f,color:#fff
-    style H fill:#0078D4,stroke:#00508f,color:#fff
-```
+<div align="center">
+  <img src="assets/architecture.svg" alt="SA2DGE rendering flow" width="720"/>
+</div>
 
 ### 🔍 How It Works
 
@@ -111,11 +95,9 @@ flowchart TD
 
 SA2DGE is developed in small, testable steps. Each subsystem follows the same cycle:
 
-```mermaid
-flowchart LR
-    A["🧠 Understand"] --> B["📐 Design"] --> C["⚒️ Implement"] --> D["🧪 Test"] --> E["🔌 Integrate"]
-    E -.->|next layer| A
-```
+<div align="center">
+  <img src="assets/lifecycle.svg" alt="Understand, Design, Implement, Test, Integrate" width="800"/>
+</div>
 
 ---
 
@@ -154,7 +136,7 @@ The source code is publicly available for educational viewing and learning only.
 
 <div align="center">
 
-### 🎮 SA2DGE — Shreyas's Advanced 2D Game Engine
+### 🎮 SA2DGE — Shreyas's Advanced 2 Dimensional Game Engine
 
 *Built to understand the technology behind 2D games.*
 
