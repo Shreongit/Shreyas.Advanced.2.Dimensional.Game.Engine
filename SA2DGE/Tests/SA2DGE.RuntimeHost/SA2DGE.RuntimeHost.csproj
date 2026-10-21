@@ -11,4 +11,8 @@
         <ProjectReference Include="..\..\Engine\SA2DGE.Engine\SA2DGE.Engine.csproj" />
     </ItemGroup>
 
+    <ItemGroup>
+      <PackageReference Include="StbImageSharp" Version="2.30.16" />
+    </ItemGroup>
+
 </Project>

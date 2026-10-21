@@ -35,6 +35,15 @@
           "buildMultiTargeting/_._": {}
         }
       },
+      "StbImageSharp/2.30.16": {
+        "type": "package",
+        "compile": {
+          "lib/net8.0/StbImageSharp.dll": {}
+        },
+        "runtime": {
+          "lib/net8.0/StbImageSharp.dll": {}
+        }
+      },
       "Vortice.D3DCompiler/3.8.3": {
         "type": "package",
         "dependencies": {
@@ -196,6 +205,20 @@
         "sharpgen.runtime.com.nuspec"
       ]
     },
+    "StbImageSharp/2.30.16": {
+      "sha512": "qg1i+NHihXVKLKYacGKrauhSQIGL31eBWcTC4Vc7jnGmBFj87LkRuCdXB5aDZisWMRnB6x2mcfwYXQxMWEG/lw==",
+      "type": "package",
+      "path": "stbimagesharp/2.30.16",
+      "files": [
+        ".nupkg.metadata",
+        ".signature.p7s",
+        "lib/net471/StbImageSharp.dll",
+        "lib/net8.0/StbImageSharp.dll",
+        "lib/netstandard2.0/StbImageSharp.dll",
+        "stbimagesharp.2.30.16.nupkg.sha512",
+        "stbimagesharp.nuspec"
+      ]
+    },
     "Vortice.D3DCompiler/3.8.3": {
       "sha512": "OmGPMhf/xnD8/HZ0ms1x7xSFyz+6e6mveCqhu0EioMFQYKJM35/ZVLLo+FIB5KpsrlqhM/jvYHYPAxu45YONGg==",
       "type": "package",
@@ -327,7 +350,8 @@
   },
   "projectFileDependencyGroups": {
     "net10.0": [
-      "SA2DGE.Engine >= 1.0.0"
+      "SA2DGE.Engine >= 1.0.0",
+      "StbImageSharp >= 2.30.16"
     ]
   },
   "packageFolders": {
@@ -378,6 +402,12 @@
       "net10.0": {
         "framework": "net10.0",
         "targetAlias": "net10.0",
+        "dependencies": {
+          "StbImageSharp": {
+            "target": "Package",
+            "version": "[2.30.16, )"
+          }
+        },
         "imports": [
           "net461",
           "net462",

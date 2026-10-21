@@ -1,5 +1,6 @@
 ﻿using EngineRuntime = SA2DGE.Engine.Core.Engine;
 using SA2DGE.Engine.Core;
+using StbImageSharp;
 using SA2DGE.Engine.Platform.Window;
 using SA2DGE.Engine.Platform.Input;
 using SA2DGE.Engine.Graphics.Buffers;
@@ -54,6 +55,8 @@ internal sealed class RuntimeGame : Game
     private Direct3D11Renderer2D? _renderer;
     private Texture2D? _testTexture;
     private SpriteSheet? _testSpriteSheet;
+    private Texture2D? _soldierTexture;
+    private SpriteSheet? _soldierSpriteSheet;
     private SpriteAnimation? _testAnimation;
     private SpriteAnimationController? _animationController;
 
@@ -73,9 +76,30 @@ public RuntimeGame()
 {
 }
 
+
+private Texture2D LoadPngTexture(string filePath)
+{
+    using var stream = File.OpenRead(filePath);
+
+    var image = StbImageSharp.ImageResult.FromStream(
+        stream,
+        StbImageSharp.ColorComponents.RedGreenBlueAlpha);
+
+    Console.WriteLine(
+        $"Loaded PNG: {image.Width}x{image.Height}");
+
+    return Graphics!.CreateTexture2D(
+        image.Width,
+        image.Height,
+        TextureFormat.RGBA8,
+        image.Data);
+}
+
+
 public override void Initialize()
 {
     Console.WriteLine("SA2DGE initialized.");
+    Console.WriteLine("  3 = Crawl animation");
 
     /*
      * Vertex layout:
@@ -168,6 +192,24 @@ public override void Initialize()
         TextureFormat.RGBA8,
         pixels);
     
+    string soldierPath = Path.GetFullPath(
+        Path.Combine(
+            AppContext.BaseDirectory,
+            "..",
+            "..",
+            "..",
+            "..",
+            "..",
+            "Assets",
+            "Sprites",
+            "Assault-Class.png"));
+
+    _soldierTexture = LoadPngTexture(soldierPath);
+    
+    _soldierSpriteSheet = new SpriteSheet(
+        columns: 5,
+        rows: 7);
+    
     _testSpriteSheet = new SpriteSheet(
         columns: 2,
         rows: 2);
@@ -177,29 +219,29 @@ public override void Initialize()
     _animationController.AddAnimation(
         "Idle",
         new SpriteAnimation(
-            _testSpriteSheet,
+            _soldierSpriteSheet!,
             frameDuration: 0.8f,
             loop: true,
             startFrame: 0,
-            frameCount: 1));
+            frameCount: 2));
 
     _animationController.AddAnimation(
         "Walk",
         new SpriteAnimation(
-            _testSpriteSheet,
+            _soldierSpriteSheet!,
             frameDuration: 0.25f,
             loop: true,
-            startFrame: 1,
+            startFrame: 5,
             frameCount: 2));
 
     _animationController.AddAnimation(
-        "Run",
+        "Crawl",
         new SpriteAnimation(
-            _testSpriteSheet,
-            frameDuration: 0.12f,
+            _soldierSpriteSheet!,
+            frameDuration: 0.25f,
             loop: true,
-            startFrame: 3,
-            frameCount: 1));
+            startFrame: 10,
+            frameCount: 2));
 
     _animationController.Play("Idle");
 
@@ -620,9 +662,9 @@ public override void Update(float deltaTime)
 
             if (Input.Keyboard.IsPressed(InputKey.Number3))
             {
-                _animationController.Play("Run");
+                _animationController.Play("Crawl");
                 _testAnimation = _animationController.CurrentAnimation;
-                Console.WriteLine("Active animation: Run");
+                Console.WriteLine("Active animation: Crawl");
             }
         }
         
@@ -721,15 +763,16 @@ public override void Render()
 
     // Layer 3: Magenta top-left UV region of the test texture.
     
-    if (_testAnimation is not null)
+    if (_soldierTexture is not null &&
+        _soldierSpriteSheet is not null)
     {
         _renderer.DrawSpriteFrame(
             position: new Vector2(850.0f, 350.0f),
-            size: new Vector2(180.0f, 180.0f),
+            size: new Vector2(80.0f, 112.0f),
             color: new Color(1.0f, 1.0f, 1.0f, 1.0f),
-            texture: _testTexture,
-            spriteSheet: _testAnimation.SpriteSheet,
-            frameIndex: _testAnimation.CurrentFrame,
+            texture: _soldierTexture,
+            spriteSheet: _soldierSpriteSheet,
+            frameIndex: _testAnimation?.CurrentFrame ?? 0,
             layer: 3);
     }
 

@@ -8,7 +8,8 @@
     ".NETCoreApp,Version=v10.0": {
       "SA2DGE.RuntimeHost/1.0.0": {
         "dependencies": {
-          "SA2DGE.Engine": "1.0.0"
+          "SA2DGE.Engine": "1.0.0",
+          "StbImageSharp": "2.30.16"
         },
         "runtime": {
           "SA2DGE.RuntimeHost.dll": {}
@@ -30,6 +31,14 @@
           "lib/net9.0/SharpGen.Runtime.COM.dll": {
             "assemblyVersion": "2.4.2.0",
             "fileVersion": "2.4.2.0"
+          }
+        }
+      },
+      "StbImageSharp/2.30.16": {
+        "runtime": {
+          "lib/net8.0/StbImageSharp.dll": {
+            "assemblyVersion": "2.30.16.0",
+            "fileVersion": "2.30.16.0"
           }
         }
       },
@@ -123,6 +132,13 @@
       "sha512": "sha512-9lxDFMiepqo3lJQzMSjECCIONeCc2f3Drokgj6HtrTLZcJSftNgcLbD6/iXYj2iphkwgrZb1oLsDOZxoFZkawQ==",
       "path": "sharpgen.runtime.com/2.4.2-beta",
       "hashPath": "sharpgen.runtime.com.2.4.2-beta.nupkg.sha512"
+    },
+    "StbImageSharp/2.30.16": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-qg1i+NHihXVKLKYacGKrauhSQIGL31eBWcTC4Vc7jnGmBFj87LkRuCdXB5aDZisWMRnB6x2mcfwYXQxMWEG/lw==",
+      "path": "stbimagesharp/2.30.16",
+      "hashPath": "stbimagesharp.2.30.16.nupkg.sha512"
     },
     "Vortice.D3DCompiler/3.8.3": {
       "type": "package",

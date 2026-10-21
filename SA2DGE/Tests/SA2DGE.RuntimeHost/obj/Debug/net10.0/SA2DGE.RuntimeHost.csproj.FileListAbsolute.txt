@@ -23,3 +23,4 @@ C:\Users\patha\Documents\Game Development\Shreyas's Advanced 2-Dimensional Game 
 C:\Users\patha\Documents\Game Development\Shreyas's Advanced 2-Dimensional Game Engine\SA2DGE\Tests\SA2DGE.RuntimeHost\obj\Debug\net10.0\SA2DGE.RuntimeHost.pdb
 C:\Users\patha\Documents\Game Development\Shreyas's Advanced 2-Dimensional Game Engine\SA2DGE\Tests\SA2DGE.RuntimeHost\obj\Debug\net10.0\SA2DGE.RuntimeHost.genruntimeconfig.cache
 C:\Users\patha\Documents\Game Development\Shreyas's Advanced 2-Dimensional Game Engine\SA2DGE\Tests\SA2DGE.RuntimeHost\obj\Debug\net10.0\ref\SA2DGE.RuntimeHost.dll
+C:\Users\patha\Documents\Game Development\Shreyas's Advanced 2-Dimensional Game Engine\SA2DGE\Tests\SA2DGE.RuntimeHost\bin\Debug\net10.0\StbImageSharp.dll

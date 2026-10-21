@@ -24,7 +24,7 @@ public  class Texture2D : Texture
         int width,
         int height,
         TextureFormat format = TextureFormat.RGBA8,
-        TextureFilter filter = TextureFilter.Linear,
+        TextureFilter filter = TextureFilter.Nearest,
         TextureWrap wrap = TextureWrap.ClampToEdge)
         : base(width, height)
     {
@@ -44,7 +44,7 @@ public  class Texture2D : Texture
         int height,
         ReadOnlySpan<byte> data,
         TextureFormat format = TextureFormat.RGBA8,
-        TextureFilter filter = TextureFilter.Linear,
+        TextureFilter filter = TextureFilter.Nearest,
         TextureWrap wrap = TextureWrap.ClampToEdge)
         : this(
             width,
