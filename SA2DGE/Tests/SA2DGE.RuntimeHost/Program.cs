@@ -176,15 +176,30 @@ public override void Initialize()
 
     _animationController.AddAnimation(
         "Idle",
-        new SpriteAnimation(_testSpriteSheet, 0.8f, loop: true));
+        new SpriteAnimation(
+            _testSpriteSheet,
+            frameDuration: 0.8f,
+            loop: true,
+            startFrame: 0,
+            frameCount: 1));
 
     _animationController.AddAnimation(
         "Walk",
-        new SpriteAnimation(_testSpriteSheet, 0.25f, loop: true));
+        new SpriteAnimation(
+            _testSpriteSheet,
+            frameDuration: 0.25f,
+            loop: true,
+            startFrame: 1,
+            frameCount: 2));
 
     _animationController.AddAnimation(
         "Run",
-        new SpriteAnimation(_testSpriteSheet, 0.12f, loop: true));
+        new SpriteAnimation(
+            _testSpriteSheet,
+            frameDuration: 0.12f,
+            loop: true,
+            startFrame: 3,
+            frameCount: 1));
 
     _animationController.Play("Idle");
 
@@ -461,6 +476,49 @@ private void TestSpriteAnimation()
     Console.WriteLine("PASS: Restart resets frame, timer, and playback state.");
 
     Console.WriteLine("All SpriteAnimation behaviour tests passed.");
+    
+    
+    // Test 9: Animation stays within its assigned frame range.
+    var rangeTest = new SpriteAnimation(
+        _testSpriteSheet!,
+        frameDuration: 0.5f,
+        loop: true,
+        startFrame: 1,
+        frameCount: 2);
+
+    if (rangeTest.CurrentFrame != 1)
+        throw new Exception("FAIL: Frame range start.");
+
+    rangeTest.Play();
+    rangeTest.Update(0.5f);
+
+    if (rangeTest.CurrentFrame != 2)
+        throw new Exception("FAIL: Frame range advancement.");
+
+    rangeTest.Update(0.5f);
+
+    if (rangeTest.CurrentFrame != 1)
+        throw new Exception("FAIL: Frame range loop boundary.");
+
+    Console.WriteLine("PASS: Animation stays within its assigned frame range.");
+
+    // Test 10: Manual selection cannot escape the assigned range.
+    bool rejectedOutOfRangeFrame = false;
+
+    try
+    {
+        rangeTest.SetFrame(3);
+    }
+    catch (ArgumentOutOfRangeException)
+    {
+        rejectedOutOfRangeFrame = true;
+    }
+
+    if (!rejectedOutOfRangeFrame)
+        throw new Exception("FAIL: Frame range validation.");
+
+    Console.WriteLine("PASS: Manual frame selection respects range boundaries.");
+
 }
 
 
@@ -502,17 +560,18 @@ public override void Update(float deltaTime)
                 $"Animation: Looping = {_testAnimation.Loop}");
         }
         
+        
         if (Input.Keyboard.IsPressed(InputKey.Left))
         {
             _testAnimation.Pause();
 
             int previousFrame = _testAnimation.CurrentFrame - 1;
 
-            if (previousFrame < 0)
+            if (previousFrame < _testAnimation.StartFrame)
             {
                 previousFrame = _testAnimation.Loop
-                    ? _testAnimation.SpriteSheet.FrameCount - 1
-                    : 0;
+                    ? _testAnimation.EndFrame
+                    : _testAnimation.StartFrame;
             }
 
             _testAnimation.SetFrame(previousFrame);
@@ -521,17 +580,19 @@ public override void Update(float deltaTime)
                 $"Animation: Frame {_testAnimation.CurrentFrame}");
         }
 
+
+        
         if (Input.Keyboard.IsPressed(InputKey.Right))
         {
             _testAnimation.Pause();
 
             int nextFrame = _testAnimation.CurrentFrame + 1;
 
-            if (nextFrame >= _testAnimation.SpriteSheet.FrameCount)
+            if (nextFrame > _testAnimation.EndFrame)
             {
                 nextFrame = _testAnimation.Loop
-                    ? 0
-                    : _testAnimation.SpriteSheet.FrameCount - 1;
+                    ? _testAnimation.StartFrame
+                    : _testAnimation.EndFrame;
             }
 
             _testAnimation.SetFrame(nextFrame);
@@ -539,6 +600,7 @@ public override void Update(float deltaTime)
             Console.WriteLine(
                 $"Animation: Frame {_testAnimation.CurrentFrame}");
         }
+
         
         if (_animationController is not null)
         {

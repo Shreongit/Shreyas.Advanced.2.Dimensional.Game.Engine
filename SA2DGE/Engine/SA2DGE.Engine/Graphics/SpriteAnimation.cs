@@ -2,7 +2,7 @@
 namespace SA2DGE.Engine.Graphics;
 
 /// <summary>
-/// Advances through a SpriteSheet's frames over time.
+/// Advances through a selected range of a SpriteSheet's frames over time.
 /// </summary>
 public sealed class SpriteAnimation
 {
@@ -12,16 +12,33 @@ public sealed class SpriteAnimation
 
     public float FrameDuration { get; }
 
+    /// <summary>
+    /// First frame included in this animation.
+    /// </summary>
+    public int StartFrame { get; }
+
+    /// <summary>
+    /// Number of frames included in this animation.
+    /// </summary>
+    public int FrameCount { get; }
+
+    /// <summary>
+    /// Index of the currently displayed frame in the full sprite sheet.
+    /// </summary>
     public int CurrentFrame { get; private set; }
 
     public bool IsPlaying { get; private set; }
 
     public bool Loop { get; set; }
 
+    public int EndFrame => StartFrame + FrameCount - 1;
+
     public SpriteAnimation(
         SpriteSheet spriteSheet,
         float frameDuration,
-        bool loop = true)
+        bool loop = true,
+        int startFrame = 0,
+        int? frameCount = null)
     {
         ArgumentNullException.ThrowIfNull(spriteSheet);
 
@@ -34,10 +51,30 @@ public sealed class SpriteAnimation
                 "Frame duration must be a finite value greater than zero.");
         }
 
+        if (startFrame < 0 || startFrame >= spriteSheet.FrameCount)
+        {
+            throw new ArgumentOutOfRangeException(
+                nameof(startFrame),
+                "Start frame must be within the sprite sheet.");
+        }
+
+        int resolvedFrameCount = frameCount
+            ?? (spriteSheet.FrameCount - startFrame);
+
+        if (resolvedFrameCount <= 0 ||
+            resolvedFrameCount > spriteSheet.FrameCount - startFrame)
+        {
+            throw new ArgumentOutOfRangeException(
+                nameof(frameCount),
+                "Frame count must fit within the sprite sheet from startFrame.");
+        }
+
         SpriteSheet = spriteSheet;
         FrameDuration = frameDuration;
         Loop = loop;
-        CurrentFrame = 0;
+        StartFrame = startFrame;
+        FrameCount = resolvedFrameCount;
+        CurrentFrame = StartFrame;
         IsPlaying = false;
     }
 
@@ -58,36 +95,35 @@ public sealed class SpriteAnimation
     }
 
     /// <summary>
-    /// Stops playback and resets to the first frame.
+    /// Stops playback and resets to the first frame of this animation.
     /// </summary>
     public void Stop()
     {
         IsPlaying = false;
-        CurrentFrame = 0;
+        CurrentFrame = StartFrame;
         _elapsedTime = 0.0f;
     }
-    
+
     /// <summary>
-    /// Restarts playback from the first frame.
+    /// Restarts playback from the first frame of this animation.
     /// </summary>
     public void Restart()
     {
-        CurrentFrame = 0;
+        CurrentFrame = StartFrame;
         _elapsedTime = 0.0f;
         IsPlaying = true;
     }
 
     /// <summary>
-    /// Selects a frame manually and resets its elapsed time.
+    /// Selects a frame by its absolute index in the sprite sheet.
     /// </summary>
     public void SetFrame(int frameIndex)
     {
-        if (frameIndex < 0 ||
-            frameIndex >= SpriteSheet.FrameCount)
+        if (frameIndex < StartFrame || frameIndex > EndFrame)
         {
             throw new ArgumentOutOfRangeException(
                 nameof(frameIndex),
-                $"Frame index must be between 0 and {SpriteSheet.FrameCount - 1}.");
+                $"Frame index must be between {StartFrame} and {EndFrame}.");
         }
 
         CurrentFrame = frameIndex;
@@ -108,7 +144,7 @@ public sealed class SpriteAnimation
                 "Delta time must be a finite, non-negative value.");
         }
 
-        if (!IsPlaying || SpriteSheet.FrameCount <= 1)
+        if (!IsPlaying || FrameCount <= 1)
             return;
 
         _elapsedTime += deltaTime;
@@ -117,17 +153,17 @@ public sealed class SpriteAnimation
         {
             _elapsedTime -= FrameDuration;
 
-            if (CurrentFrame < SpriteSheet.FrameCount - 1)
+            if (CurrentFrame < EndFrame)
             {
                 CurrentFrame++;
             }
             else if (Loop)
             {
-                CurrentFrame = 0;
+                CurrentFrame = StartFrame;
             }
             else
             {
-                CurrentFrame = SpriteSheet.FrameCount - 1;
+                CurrentFrame = EndFrame;
                 _elapsedTime = 0.0f;
                 IsPlaying = false;
                 break;
