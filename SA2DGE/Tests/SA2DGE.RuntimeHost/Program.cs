@@ -59,10 +59,8 @@ internal sealed class RuntimeGame : Game
     private SpriteSheet? _soldierSpriteSheet;
     private SpriteAnimation? _testAnimation;
     private SpriteAnimationController? _animationController;
-    private Vector2 _playerPosition = new(850.0f, 350.0f);
-    private float _playerMoveSpeed = 180.0f;
-    private bool _facingLeft = false;
-    private bool _isMoving = false;
+    private PlayerController? _playerController;
+    
 
 
 public RuntimeGame()
@@ -252,9 +250,19 @@ public override void Initialize()
     _testAnimation = _animationController.CurrentAnimation
                      ?? throw new InvalidOperationException(
                          "The animation controller failed to select the Idle animation.");
+    
+    _playerController = new PlayerController(
+        animations: _animationController,
+        keyboard: Input.Keyboard,
+        initialPosition: new Vector2(850.0f, 350.0f),
+        moveSpeed: 180.0f,
+        windowWidth: 1280.0f,
+        windowHeight: 720.0f,
+        spriteWidth: 80.0f,
+        spriteHeight: 112.0f);
 
     Console.WriteLine(
-        "Stage 4.2.5: Idle, Walk, and Run animations registered.");
+        "Stage 4.7.5: Idle, Walk, and Run animations registered.");
     
     Console.WriteLine("Controls:");
     Console.WriteLine("  1 = Idle animation");
@@ -570,77 +578,9 @@ private void TestSpriteAnimation()
 
 public override void Update(float deltaTime)
 {
-    float moveX = 0.0f;
-    float moveY = 0.0f;
-
-    if (Input.Keyboard.IsDown(InputKey.A) ||
-        Input.Keyboard.IsDown(InputKey.Left))
-    {
-        moveX -= 1.0f;
-    }
-
-    if (Input.Keyboard.IsDown(InputKey.D) ||
-        Input.Keyboard.IsDown(InputKey.Right))
-    {
-        moveX += 1.0f;
-    }
-
-    if (Input.Keyboard.IsDown(InputKey.W) ||
-        Input.Keyboard.IsDown(InputKey.Up))
-    {
-        moveY -= 1.0f;
-    }
-
-    if (Input.Keyboard.IsDown(InputKey.S) ||
-        Input.Keyboard.IsDown(InputKey.Down))
-    {
-        moveY += 1.0f;
-    }
-
-    bool moving = moveX != 0.0f || moveY != 0.0f;
-
-// Normalize diagonal movement.
-    if (moving)
-    {
-        float length = MathF.Sqrt(moveX * moveX + moveY * moveY);
-        moveX /= length;
-        moveY /= length;
-
-        _playerPosition = new Vector2(
-            _playerPosition.X + moveX * _playerMoveSpeed * deltaTime,
-            _playerPosition.Y + moveY * _playerMoveSpeed * deltaTime);
-
-        // Remember the direction the soldier is facing.
-        if (moveX < 0.0f)
-        {
-            _facingLeft = true;
-        }
-        else if (moveX > 0.0f)
-        {
-            _facingLeft = false;
-        }
-    }
-
-// Keep the whole 80x112 sprite inside the 1280x720 window.
-    _playerPosition = new Vector2(
-        Math.Clamp(_playerPosition.X, 40.0f, 1240.0f),
-        Math.Clamp(_playerPosition.Y, 56.0f, 664.0f));
-
-// Switch between Idle and Walk only when movement state changes.
-    if (moving != _isMoving)
-    {
-        _isMoving = moving;
-
-        _animationController?.Play(moving ? "Walk" : "Idle");
-        _testAnimation = _animationController?.CurrentAnimation;
-    }
-
-    _animationController?.Update(deltaTime);
-    _testAnimation = _animationController?.CurrentAnimation;
     
-
-    _animationController?.Update(deltaTime);
-    _testAnimation = _animationController?.CurrentAnimation;
+    _playerController?.Update(deltaTime);
+    _testAnimation = _playerController?.CurrentAnimation;
     
     if (_testAnimation is not null)
     {
@@ -836,20 +776,20 @@ public override void Render()
 
     // Layer 3: Magenta top-left UV region of the test texture.
     
-    if (_soldierTexture is not null &&
+    if (_playerController is not null &&
+        _soldierTexture is not null &&
         _soldierSpriteSheet is not null)
     {
         _renderer.DrawSpriteFrame(
-            position: _playerPosition,
+            position: _playerController.Position,
             size: new Vector2(80.0f, 112.0f),
             color: new Color(1.0f, 1.0f, 1.0f, 1.0f),
             texture: _soldierTexture,
             spriteSheet: _soldierSpriteSheet,
-            frameIndex: _testAnimation?.CurrentFrame ?? 0,
+            frameIndex: _playerController.CurrentFrame,
             layer: 3,
-            flipHorizontal: _facingLeft);
+            flipHorizontal: _playerController.IsFacingLeft);
     }
-
     _renderer.EndFrame();
     _renderer.Present();
 }
