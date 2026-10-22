@@ -221,3 +221,39 @@ Integrate sprite animation with the rendering pipeline and verify that animation
 
 The animation system and rendering runtime were successfully integrated and tested. Animation playback behaviour and keyboard-driven state switching between Idle, Walk, and Run were verified.
 
+
+# Stage 4.5 — Animation-to-Rendering Integration
+
+## Objective
+
+Integrate sprite-sheet textures, pixel-art filtering, animation playback, and keyboard controls into the Direct3D 11 rendering pipeline.
+
+## Core Concepts
+
+- **Sprite Texture Loading:** Loads `Assault-Class.png` as the texture asset used to render the soldier sprite.
+- **Nearest-Neighbor Filtering:** Preserves crisp pixel edges by sampling the nearest texel instead of blending neighbouring texels.
+- **Sprite-Sheet Integration:** Connects the 5×7 sprite sheet to the rendering pipeline so individual animation frames can be selected and displayed.
+- **Animation Playback:** Idle, Walk, and Crawl animations advance through their respective frames during runtime.
+- **Playback Controls:** Play, pause, stop, restart, and looping controls manage animation playback behaviour.
+- **Manual Frame Selection:** Allows individual frames to be selected directly for inspection and testing.
+- **Keyboard Integration:** Enables runtime animation switching and playback control through keyboard input.
+- **Rendering Validation:** Confirms that the sprite renders correctly and that existing animation tests continue to pass.
+
+## Verification Results
+
+| Feature | Result |
+|---|---|
+| Both projects build successfully | Passed |
+| Direct3D 11 runtime startup | Passed |
+| `Assault-Class.png` texture loading | Passed |
+| Nearest-neighbor pixel-art filtering | Verified |
+| 5×7 sprite-sheet integration | Verified |
+| Idle, Walk, and Crawl animation playback | Passed |
+| Keyboard animation and playback controls | Passed |
+| Existing animation tests | Passed |
+| Soldier sprite rendering | Verified |
+
+## Outcome
+
+Sprite animation is successfully integrated with the Direct3D 11 rendering pipeline. Texture loading, pixel-art filtering, animation playback, keyboard controls, and sprite rendering have been verified.
+

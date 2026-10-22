@@ -134,3 +134,7 @@ Implemented and verified sprite animation playback controls, including play, pau
 # Stage 4.3 — Animation-to-Rendering Integration
 
 Successfully built both projects and verified that the Direct3D 11 runtime starts correctly. Tested animation pause, stop, timing, looping, manual frame selection, and restart behaviour, with all tests passing. Keyboard input was verified for switching between Idle, Walk, and Run states, as well as controlling playback through pause, play, stop, and restart.
+
+# Stage 4.5 — Animation-to-Rendering Integration
+
+Successfully integrated sprite animation with the Direct3D 11 rendering pipeline. Both projects build successfully, and the runtime starts correctly. Loaded `Assault-Class.png`, configured nearest-neighbor filtering for crisp pixel-art rendering, and integrated the 5×7 sprite sheet. Idle, Walk, and Crawl animations render and advance through their frames. Keyboard controls for animation switching, play, pause, stop, restart, looping, and manual frame selection work correctly. Existing animation tests pass, and the soldier renders as expected.
