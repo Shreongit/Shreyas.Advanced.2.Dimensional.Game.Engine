@@ -257,3 +257,36 @@ Integrate sprite-sheet textures, pixel-art filtering, animation playback, and ke
 
 Sprite animation is successfully integrated with the Direct3D 11 rendering pipeline. Texture loading, pixel-art filtering, animation playback, keyboard controls, and sprite rendering have been verified.
 
+
+
+# Stage 4.6 — Player Movement and Animation Integration
+
+## Objective
+
+Integrate player movement, animation state management, directional facing, screen boundary constraints, and manual frame controls into the runtime.
+
+## Core Concepts
+
+- **Player Movement:** WASD and arrow keys provide directional movement input.
+- **Normalized Diagonal Movement:** Normalizes diagonal movement vectors to maintain consistent movement speed in all directions.
+- **Animation Integration:** Displays the Idle animation when the player is stationary and the Walk animation while moving.
+- **Facing Direction:** Uses horizontal sprite flipping to represent the player's facing direction based on movement.
+- **Screen Boundaries:** Keeps the player within the configured window limits.
+- **Manual Frame Controls:** Uses keys `4` and `5` to navigate animation frames without interfering with directional movement.
+- **Input Handling:** Ensures movement inputs and manual animation controls operate without conflicting with each other.
+
+## Verification Results
+
+| Feature | Result |
+|---|---|
+| WASD and arrow-key movement | Passed |
+| Normalized diagonal movement | Passed |
+| Idle and Walk animation switching | Passed |
+| Horizontal sprite flipping | Passed |
+| Screen boundary enforcement | Passed |
+| Manual frame controls using keys `4` and `5` | Verified — no input conflict |
+
+## Outcome
+
+Player movement and sprite animation are integrated successfully. Directional input, consistent diagonal movement, animation switching, facing direction, screen boundaries, and manual frame controls were verified.
+

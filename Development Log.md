@@ -138,3 +138,9 @@ Successfully built both projects and verified that the Direct3D 11 runtime start
 # Stage 4.5 — Animation-to-Rendering Integration
 
 Successfully integrated sprite animation with the Direct3D 11 rendering pipeline. Both projects build successfully, and the runtime starts correctly. Loaded `Assault-Class.png`, configured nearest-neighbor filtering for crisp pixel-art rendering, and integrated the 5×7 sprite sheet. Idle, Walk, and Crawl animations render and advance through their frames. Keyboard controls for animation switching, play, pause, stop, restart, looping, and manual frame selection work correctly. Existing animation tests pass, and the soldier renders as expected.
+
+
+# Stage 4.6 — Player Movement and Animation Integration
+
+Implemented and verified player movement using WASD and arrow keys, including normalized diagonal movement. Integrated animation state switching so the player displays Idle while stationary and Walk while moving. Added horizontal sprite flipping based on movement direction and enforced configured screen boundaries. Manual animation frame controls using keys `4` and `5` were verified without conflicting with directional movement.
+
