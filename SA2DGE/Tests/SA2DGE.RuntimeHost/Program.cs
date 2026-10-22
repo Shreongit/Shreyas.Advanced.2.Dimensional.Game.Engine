@@ -59,6 +59,10 @@ internal sealed class RuntimeGame : Game
     private SpriteSheet? _soldierSpriteSheet;
     private SpriteAnimation? _testAnimation;
     private SpriteAnimationController? _animationController;
+    private Vector2 _playerPosition = new(850.0f, 350.0f);
+    private float _playerMoveSpeed = 180.0f;
+    private bool _facingLeft = false;
+    private bool _isMoving = false;
 
 
 public RuntimeGame()
@@ -261,7 +265,7 @@ public override void Initialize()
     Console.WriteLine("  K = Stop");
     Console.WriteLine("  R = Restart");
     Console.WriteLine("  L = Toggle looping");
-    Console.WriteLine("  Left / Right = Select frame");
+    Console.WriteLine("  4 / 5 = Select animation frame");
 
     Console.WriteLine("Stage 3 checkerboard texture created.");
 
@@ -566,6 +570,75 @@ private void TestSpriteAnimation()
 
 public override void Update(float deltaTime)
 {
+    float moveX = 0.0f;
+    float moveY = 0.0f;
+
+    if (Input.Keyboard.IsDown(InputKey.A) ||
+        Input.Keyboard.IsDown(InputKey.Left))
+    {
+        moveX -= 1.0f;
+    }
+
+    if (Input.Keyboard.IsDown(InputKey.D) ||
+        Input.Keyboard.IsDown(InputKey.Right))
+    {
+        moveX += 1.0f;
+    }
+
+    if (Input.Keyboard.IsDown(InputKey.W) ||
+        Input.Keyboard.IsDown(InputKey.Up))
+    {
+        moveY -= 1.0f;
+    }
+
+    if (Input.Keyboard.IsDown(InputKey.S) ||
+        Input.Keyboard.IsDown(InputKey.Down))
+    {
+        moveY += 1.0f;
+    }
+
+    bool moving = moveX != 0.0f || moveY != 0.0f;
+
+// Normalize diagonal movement.
+    if (moving)
+    {
+        float length = MathF.Sqrt(moveX * moveX + moveY * moveY);
+        moveX /= length;
+        moveY /= length;
+
+        _playerPosition = new Vector2(
+            _playerPosition.X + moveX * _playerMoveSpeed * deltaTime,
+            _playerPosition.Y + moveY * _playerMoveSpeed * deltaTime);
+
+        // Remember the direction the soldier is facing.
+        if (moveX < 0.0f)
+        {
+            _facingLeft = true;
+        }
+        else if (moveX > 0.0f)
+        {
+            _facingLeft = false;
+        }
+    }
+
+// Keep the whole 80x112 sprite inside the 1280x720 window.
+    _playerPosition = new Vector2(
+        Math.Clamp(_playerPosition.X, 40.0f, 1240.0f),
+        Math.Clamp(_playerPosition.Y, 56.0f, 664.0f));
+
+// Switch between Idle and Walk only when movement state changes.
+    if (moving != _isMoving)
+    {
+        _isMoving = moving;
+
+        _animationController?.Play(moving ? "Walk" : "Idle");
+        _testAnimation = _animationController?.CurrentAnimation;
+    }
+
+    _animationController?.Update(deltaTime);
+    _testAnimation = _animationController?.CurrentAnimation;
+    
+
     _animationController?.Update(deltaTime);
     _testAnimation = _animationController?.CurrentAnimation;
     
@@ -603,7 +676,7 @@ public override void Update(float deltaTime)
         }
         
         
-        if (Input.Keyboard.IsPressed(InputKey.Left))
+        if (Input.Keyboard.IsPressed(InputKey.Number4))
         {
             _testAnimation.Pause();
 
@@ -624,7 +697,7 @@ public override void Update(float deltaTime)
 
 
         
-        if (Input.Keyboard.IsPressed(InputKey.Right))
+        if (Input.Keyboard.IsPressed(InputKey.Number5))
         {
             _testAnimation.Pause();
 
@@ -767,13 +840,14 @@ public override void Render()
         _soldierSpriteSheet is not null)
     {
         _renderer.DrawSpriteFrame(
-            position: new Vector2(850.0f, 350.0f),
+            position: _playerPosition,
             size: new Vector2(80.0f, 112.0f),
             color: new Color(1.0f, 1.0f, 1.0f, 1.0f),
             texture: _soldierTexture,
             spriteSheet: _soldierSpriteSheet,
             frameIndex: _testAnimation?.CurrentFrame ?? 0,
-            layer: 3);
+            layer: 3,
+            flipHorizontal: _facingLeft);
     }
 
     _renderer.EndFrame();
