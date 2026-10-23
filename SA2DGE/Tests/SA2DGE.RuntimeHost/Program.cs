@@ -60,6 +60,9 @@ internal sealed class RuntimeGame : Game
     private SpriteAnimation? _testAnimation;
     private SpriteAnimationController? _animationController;
     private PlayerController? _playerController;
+    private const float SpeedAdjustment = 30.0f;
+    private const float MinimumMoveSpeed = 0.0f;
+    private const float MaximumMoveSpeed = 600.0f;
     
 
 
@@ -581,6 +584,31 @@ public override void Update(float deltaTime)
     
     _playerController?.Update(deltaTime);
     _testAnimation = _playerController?.CurrentAnimation;
+    
+    
+    if (_playerController is not null)
+    {
+        if (Input.Keyboard.IsPressed(InputKey.F2))
+        {
+            _playerController.MoveSpeed = Math.Max(
+                MinimumMoveSpeed,
+                _playerController.MoveSpeed - SpeedAdjustment);
+
+            Console.WriteLine(
+                $"Player speed: {_playerController.MoveSpeed:F0}");
+        }
+
+        if (Input.Keyboard.IsPressed(InputKey.F1))
+        {
+            _playerController.MoveSpeed = Math.Min(
+                MaximumMoveSpeed,
+                _playerController.MoveSpeed + SpeedAdjustment);
+
+            Console.WriteLine(
+                $"Player speed: {_playerController.MoveSpeed:F0}");
+        }
+    }
+
     
     if (_testAnimation is not null)
     {

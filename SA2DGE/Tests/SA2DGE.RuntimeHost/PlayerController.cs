@@ -7,7 +7,7 @@ internal sealed class PlayerController
 {
     private readonly SpriteAnimationController _animations;
     private readonly Keyboard _keyboard;
-    private readonly float _moveSpeed;
+    private float _moveSpeed;
     private readonly float _windowWidth;
     private readonly float _windowHeight;
     private readonly float _spriteWidth;
@@ -20,10 +20,23 @@ internal sealed class PlayerController
     public bool IsFacingLeft { get; private set; }
     
     
+    
     public float MoveSpeed
     {
         get => _moveSpeed;
+        set
+        {
+            if (!float.IsFinite(value) || value < 0.0f)
+            {
+                throw new ArgumentOutOfRangeException(
+                    nameof(value),
+                    "Movement speed must be finite and non-negative.");
+            }
+
+            _moveSpeed = value;
+        }
     }
+
 
     public SpriteAnimation? CurrentAnimation =>
         _animations.CurrentAnimation;
