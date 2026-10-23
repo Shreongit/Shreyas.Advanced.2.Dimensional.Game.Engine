@@ -48,3 +48,14 @@ internal sealed class KeyboardPlayerMovementInput : IPlayerMovementInput
         return new Vector2(horizontal, vertical);
     }
 }
+
+
+internal sealed class TestPlayerMovementInput : IPlayerMovementInput
+{
+    public Vector2 MovementDirection { get; set; } = Vector2.Zero;
+
+    public Vector2 GetMovementDirection()
+    {
+        return MovementDirection;
+    }
+}
