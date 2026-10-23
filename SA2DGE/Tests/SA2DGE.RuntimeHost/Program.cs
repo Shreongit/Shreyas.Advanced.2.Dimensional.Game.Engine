@@ -256,7 +256,7 @@ public override void Initialize()
     
     _playerController = new PlayerController(
         animations: _animationController,
-        keyboard: Input.Keyboard,
+        movementInput: new KeyboardPlayerMovementInput(Input.Keyboard),
         initialPosition: new Vector2(850.0f, 350.0f),
         moveSpeed: 180.0f,
         windowWidth: 1280.0f,

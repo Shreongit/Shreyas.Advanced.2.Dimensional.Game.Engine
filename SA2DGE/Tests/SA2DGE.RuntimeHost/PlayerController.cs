@@ -6,7 +6,7 @@ using SA2DGE.Engine.Platform.Input;
 internal sealed class PlayerController
 {
     private readonly SpriteAnimationController _animations;
-    private readonly Keyboard _keyboard;
+    private readonly IPlayerMovementInput _movementInput;
     private float _moveSpeed;
     private readonly float _windowWidth;
     private readonly float _windowHeight;
@@ -46,7 +46,7 @@ internal sealed class PlayerController
 
     public PlayerController(
         SpriteAnimationController animations,
-        Keyboard keyboard,
+        IPlayerMovementInput movementInput,
         Vector2 initialPosition,
         float moveSpeed,
         float windowWidth,
@@ -87,7 +87,8 @@ internal sealed class PlayerController
 
 
         _animations = animations;
-        _keyboard = keyboard ?? throw new ArgumentNullException(nameof(keyboard));
+        _movementInput = movementInput
+                         ?? throw new ArgumentNullException(nameof(movementInput));
         _moveSpeed = moveSpeed;
         _windowWidth = windowWidth;
         _windowHeight = windowHeight;
@@ -104,33 +105,11 @@ internal sealed class PlayerController
     {
         if (deltaTime < 0.0f)
             throw new ArgumentOutOfRangeException(nameof(deltaTime));
+        
+        Vector2 movement = _movementInput.GetMovementDirection();
 
-        float moveX = 0.0f;
-        float moveY = 0.0f;
-
-        if (_keyboard.IsDown(InputKey.A) ||
-            _keyboard.IsDown(InputKey.Left))
-        {
-            moveX -= 1.0f;
-        }
-
-        if (_keyboard.IsDown(InputKey.D) ||
-            _keyboard.IsDown(InputKey.Right))
-        {
-            moveX += 1.0f;
-        }
-
-        if (_keyboard.IsDown(InputKey.W) ||
-            _keyboard.IsDown(InputKey.Up))
-        {
-            moveY -= 1.0f;
-        }
-
-        if (_keyboard.IsDown(InputKey.S) ||
-            _keyboard.IsDown(InputKey.Down))
-        {
-            moveY += 1.0f;
-        }
+        float moveX = movement.X;
+        float moveY = movement.Y;
 
         bool moving = moveX != 0.0f || moveY != 0.0f;
 
