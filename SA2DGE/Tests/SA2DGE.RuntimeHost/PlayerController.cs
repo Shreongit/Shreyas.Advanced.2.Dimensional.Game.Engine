@@ -18,6 +18,12 @@ internal sealed class PlayerController
     public Vector2 Position { get; private set; }
 
     public bool IsFacingLeft { get; private set; }
+    
+    
+    public float MoveSpeed
+    {
+        get => _moveSpeed;
+    }
 
     public SpriteAnimation? CurrentAnimation =>
         _animations.CurrentAnimation;
@@ -35,14 +41,37 @@ internal sealed class PlayerController
         float spriteWidth,
         float spriteHeight)
     {
+        
+        
         ArgumentNullException.ThrowIfNull(animations);
 
-        if (moveSpeed < 0.0f)
+        if (!float.IsFinite(moveSpeed) || moveSpeed < 0.0f)
             throw new ArgumentOutOfRangeException(nameof(moveSpeed));
+
+        if (!float.IsFinite(windowWidth) ||
+            !float.IsFinite(windowHeight) ||
+            !float.IsFinite(spriteWidth) ||
+            !float.IsFinite(spriteHeight) ||
+            windowWidth <= 0.0f ||
+            windowHeight <= 0.0f ||
+            spriteWidth <= 0.0f ||
+            spriteHeight <= 0.0f)
+        {
+            throw new ArgumentOutOfRangeException(
+                nameof(windowWidth),
+                "Window and sprite dimensions must be finite and positive.");
+        }
 
         if (windowWidth < spriteWidth || windowHeight < spriteHeight)
             throw new ArgumentException(
                 "The sprite must fit inside the game window.");
+
+        if (!float.IsFinite(initialPosition.X) ||
+            !float.IsFinite(initialPosition.Y))
+        {
+            throw new ArgumentOutOfRangeException(nameof(initialPosition));
+        }
+
 
         _animations = animations;
         _keyboard = keyboard ?? throw new ArgumentNullException(nameof(keyboard));
