@@ -153,5 +153,89 @@ public sealed class PlayerControllerTests
         Assert.True(controller.Position.Y >= 56.0f);
         Assert.True(controller.Position.Y <= 664.0f);
     }
+    
+    
+    [Theory]
+    [InlineData(-0.1f)]
+    [InlineData(float.NaN)]
+    [InlineData(float.PositiveInfinity)]
+    [InlineData(float.NegativeInfinity)]
+    public void Update_InvalidDeltaTime_Throws(float deltaTime)
+    {
+        var input = new TestPlayerMovementInput();
+        var controller = CreateController(input);
+
+        Assert.Throws<ArgumentOutOfRangeException>(
+            () => controller.Update(deltaTime));
+    }
+
+    [Fact]
+    public void Update_ZeroDeltaTime_DoesNotMovePlayer()
+    {
+        var input = new TestPlayerMovementInput
+        {
+            MovementDirection = new Vector2(1.0f, 0.0f)
+        };
+
+        var controller = CreateController(input);
+        Vector2 initialPosition = controller.Position;
+
+        controller.Update(0.0f);
+
+        Assert.Equal(initialPosition.X, controller.Position.X);
+        Assert.Equal(initialPosition.Y, controller.Position.Y);
+    }
+    
+    
+    [Fact]
+    public void ZeroMoveSpeed_DoesNotChangePosition()
+    {
+        var input = new TestPlayerMovementInput
+        {
+            MovementDirection = new Vector2(1.0f, 0.0f)
+        };
+
+        var controller = CreateController(input);
+        controller.MoveSpeed = 0.0f;
+
+        Vector2 initialPosition = controller.Position;
+        controller.Update(1.0f);
+
+        Assert.Equal(initialPosition.X, controller.Position.X);
+        Assert.Equal(initialPosition.Y, controller.Position.Y);
+    }
+
+    [Fact]
+    public void MaximumMoveSpeed_MovesPlayerAtExpectedSpeed()
+    {
+        var input = new TestPlayerMovementInput
+        {
+            MovementDirection = new Vector2(1.0f, 0.0f)
+        };
+
+        var controller = CreateController(input);
+        controller.MoveSpeed = 600.0f;
+
+        float initialX = controller.Position.X;
+        controller.Update(0.5f);
+
+        Assert.Equal(initialX + 300.0f, controller.Position.X, 3);
+    }
+
+    [Theory]
+    [InlineData(-1.0f)]
+    [InlineData(float.NaN)]
+    [InlineData(float.PositiveInfinity)]
+    [InlineData(float.NegativeInfinity)]
+    public void InvalidMoveSpeed_Throws(float speed)
+    {
+        var input = new TestPlayerMovementInput();
+        var controller = CreateController(input);
+
+        Assert.Throws<ArgumentOutOfRangeException>(
+            () => controller.MoveSpeed = speed);
+    }
+
+
 
 }

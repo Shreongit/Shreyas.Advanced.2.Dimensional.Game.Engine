@@ -103,8 +103,13 @@ internal sealed class PlayerController
 
     public void Update(float deltaTime)
     {
-        if (deltaTime < 0.0f)
-            throw new ArgumentOutOfRangeException(nameof(deltaTime));
+        
+        if (!float.IsFinite(deltaTime) || deltaTime < 0.0f)
+        {
+            throw new ArgumentOutOfRangeException(
+                nameof(deltaTime),
+                "Delta time must be finite and non-negative.");
+        }
         
         Vector2 movement = _movementInput.GetMovementDirection();
 
