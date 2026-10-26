@@ -57,6 +57,7 @@ Restore complete (0.5s)
 [xUnit.net 00:00:00.14]   Discovered:  SA2DGE.RuntimeHost.Tests
 [xUnit.net 00:00:00.17]   Starting:    SA2DGE.RuntimeHost.Tests
 [xUnit.net 00:00:00.25]   Finished:    SA2DGE.RuntimeHost.Tests
+
   SA2DGE.RuntimeHost.Tests test net10.0 succeeded (1.0s)
 
 Test summary: total: 21, failed: 0, succeeded: 21, skipped: 0, duration: 1.0s
