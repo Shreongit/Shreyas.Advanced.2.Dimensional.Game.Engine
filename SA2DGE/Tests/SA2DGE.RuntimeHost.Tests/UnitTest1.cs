@@ -235,6 +235,68 @@ public sealed class PlayerControllerTests
         Assert.Throws<ArgumentOutOfRangeException>(
             () => controller.MoveSpeed = speed);
     }
+    
+    [Theory]
+    [InlineData(-1.0f, 0.0f)]
+    [InlineData(1.0f, 0.0f)]
+    [InlineData(0.0f, -1.0f)]
+    [InlineData(0.0f, 1.0f)]
+    public void SustainedMovement_StaysWithinWindow(
+        float directionX,
+        float directionY)
+    {
+        var input = new TestPlayerMovementInput
+        {
+            MovementDirection = new Vector2(directionX, directionY)
+        };
+
+        var controller = CreateController(input);
+        controller.MoveSpeed = 600.0f;
+
+        for (int i = 0; i < 10; i++)
+        {
+            controller.Update(1.0f);
+        }
+
+        Assert.InRange(controller.Position.X, 40.0f, 1240.0f);
+        Assert.InRange(controller.Position.Y, 56.0f, 664.0f);
+    }
+    
+    
+    [Fact]
+    public void OpposingHorizontalInput_CancelsOut()
+    {
+        var input = new TestPlayerMovementInput
+        {
+            MovementDirection = new Vector2(0.0f, 0.0f)
+        };
+
+        var controller = CreateController(input);
+        Vector2 initialPosition = controller.Position;
+
+        controller.Update(1.0f);
+
+        Assert.Equal(initialPosition.X, controller.Position.X);
+        Assert.Equal(initialPosition.Y, controller.Position.Y);
+    }
+
+    [Fact]
+    public void OpposingVerticalInput_CancelsOut()
+    {
+        var input = new TestPlayerMovementInput
+        {
+            MovementDirection = new Vector2(0.0f, 0.0f)
+        };
+
+        var controller = CreateController(input);
+        Vector2 initialPosition = controller.Position;
+
+        controller.Update(1.0f);
+
+        Assert.Equal(initialPosition.X, controller.Position.X);
+        Assert.Equal(initialPosition.Y, controller.Position.Y);
+    }
+
 
 
 
