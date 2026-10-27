@@ -56,6 +56,8 @@ internal sealed class RuntimeGame : Game
     private Texture2D? _testTexture;
     private SpriteSheet? _testSpriteSheet;
     private Texture2D? _soldierTexture;
+    private Texture2D? _backgroundTexture;
+    private SpriteSheet? _backgroundSpriteSheet;
     private SpriteSheet? _soldierSpriteSheet;
     private SpriteAnimation? _testAnimation;
     private SpriteAnimationController? _animationController;
@@ -196,7 +198,25 @@ public override void Initialize()
         textureSize,
         TextureFormat.RGBA8,
         pixels);
-    
+    string backgroundPath = Path.GetFullPath(
+        Path.Combine(
+            AppContext.BaseDirectory,
+            "..",
+            "..",
+            "..",
+            "..",
+            "..",
+            "Assets",
+            "Backgrounds",
+            "robot_warfare_background.png"));
+
+    _backgroundTexture = LoadPngTexture(backgroundPath);
+
+    _backgroundSpriteSheet = new SpriteSheet(
+        columns: 1,
+        rows: 1);
+
+    Console.WriteLine("Stage 4.13: Background texture loaded.");
     string soldierPath = Path.GetFullPath(
         Path.Combine(
             AppContext.BaseDirectory,
@@ -774,33 +794,23 @@ public override void Render()
 
     _renderer!.BeginFrame();
 
-    // Layer 0: Large red background rectangle.
-    _renderer.DrawRectangle(
-        new Vector2(640.0f, 360.0f),
-        new Vector2(400.0f, 250.0f),
-        new Color(255, 0, 0, 255));
-
-    // Layer 0: Red rectangle.
-    _renderer.DrawRectangle(
-        new Vector2(500.0f, 300.0f),
-        new Vector2(300.0f, 180.0f),
-        new Color(1.0f, 0.0f, 0.0f, 1.0f),
-        layer: 0);
-
-    // Layer 1: Green rectangle over the red rectangle.
-    _renderer.DrawRectangle(
-        new Vector2(500.0f, 300.0f),
-        new Vector2(220.0f, 130.0f),
-        new Color(0.0f, 1.0f, 0.0f, 1.0f),
-        layer: 1);
-
-    // Layer 2: Rotated blue rectangle.
-    _renderer.DrawRectangle(
-        new Vector2(500.0f, 300.0f),
-        new Vector2(150.0f, 70.0f),
-        new Color(0.0f, 0.0f, 1.0f, 1.0f),
-        layer: 2,
-        rotation: 0.785398f);
+    // Layer 0: Full-screen background.
+    if (_backgroundTexture is not null &&
+        _backgroundSpriteSheet is not null)
+    {
+        _renderer!.DrawSpriteFrame(
+            position: new Vector2(
+                Graphics!.Width / 2.0f,
+                Graphics.Height / 2.0f),
+            size: new Vector2(
+                Graphics.Width,
+                Graphics.Height),
+            color: new Color(1.0f, 1.0f, 1.0f, 1.0f),
+            texture: _backgroundTexture,
+            spriteSheet: _backgroundSpriteSheet,
+            frameIndex: 0,
+            layer: 0);
+    }
 
     // Layer 3: Magenta top-left UV region of the test texture.
     
@@ -828,6 +838,11 @@ public override void Shutdown()
 {
     _testTexture?.Dispose();
     _testTexture = null;
+    
+    _backgroundTexture?.Dispose();
+    _backgroundTexture = null;
+
+    _backgroundSpriteSheet = null;
     
     _renderer?.Shutdown();
     _renderer?.Dispose();
