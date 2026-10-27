@@ -56,8 +56,7 @@ internal sealed class RuntimeGame : Game
     private Texture2D? _testTexture;
     private SpriteSheet? _testSpriteSheet;
     private Texture2D? _soldierTexture;
-    private Texture2D? _backgroundTexture;
-    private SpriteSheet? _backgroundSpriteSheet;
+    private BackgroundLayer? _backgroundLayer;
     private SpriteSheet? _soldierSpriteSheet;
     private SpriteAnimation? _testAnimation;
     private SpriteAnimationController? _animationController;
@@ -210,11 +209,12 @@ public override void Initialize()
             "Backgrounds",
             "robot_warfare_background.png"));
 
-    _backgroundTexture = LoadPngTexture(backgroundPath);
+    _backgroundLayer = new BackgroundLayer(
+        LoadPngTexture(backgroundPath),
+        layer: 0);
 
-    _backgroundSpriteSheet = new SpriteSheet(
-        columns: 1,
-        rows: 1);
+    Console.WriteLine(
+        "Stage 4.14: Background layer initialized.");
 
     Console.WriteLine("Stage 4.13: Background texture loaded.");
     string soldierPath = Path.GetFullPath(
@@ -793,24 +793,11 @@ public override void Render()
         new Color(20, 20, 30, 255));
 
     _renderer!.BeginFrame();
-
-    // Layer 0: Full-screen background.
-    if (_backgroundTexture is not null &&
-        _backgroundSpriteSheet is not null)
-    {
-        _renderer!.DrawSpriteFrame(
-            position: new Vector2(
-                Graphics!.Width / 2.0f,
-                Graphics.Height / 2.0f),
-            size: new Vector2(
-                Graphics.Width,
-                Graphics.Height),
-            color: new Color(1.0f, 1.0f, 1.0f, 1.0f),
-            texture: _backgroundTexture,
-            spriteSheet: _backgroundSpriteSheet,
-            frameIndex: 0,
-            layer: 0);
-    }
+    
+    _backgroundLayer?.Draw(
+        _renderer!,
+        Graphics!.Width,
+        Graphics.Height);
 
     // Layer 3: Magenta top-left UV region of the test texture.
     
@@ -839,10 +826,8 @@ public override void Shutdown()
     _testTexture?.Dispose();
     _testTexture = null;
     
-    _backgroundTexture?.Dispose();
-    _backgroundTexture = null;
-
-    _backgroundSpriteSheet = null;
+    _backgroundLayer?.Dispose();
+    _backgroundLayer = null;
     
     _renderer?.Shutdown();
     _renderer?.Dispose();
