@@ -7,20 +7,20 @@ internal sealed class PlayerController
 {
     private readonly SpriteAnimationController _animations;
     private readonly IPlayerMovementInput _movementInput;
-    private float _moveSpeed;
+
     private readonly float _windowWidth;
     private readonly float _windowHeight;
     private readonly float _spriteWidth;
     private readonly float _spriteHeight;
 
+    private Rectangle[] _collisionBounds = Array.Empty<Rectangle>();
+    private float _moveSpeed;
     private bool _isMoving;
 
     public Vector2 Position { get; private set; }
 
     public bool IsFacingLeft { get; private set; }
-    
-    
-    
+
     public float MoveSpeed
     {
         get => _moveSpeed;
@@ -36,7 +36,6 @@ internal sealed class PlayerController
             _moveSpeed = value;
         }
     }
-
 
     public SpriteAnimation? CurrentAnimation =>
         _animations.CurrentAnimation;
@@ -54,12 +53,13 @@ internal sealed class PlayerController
         float spriteWidth,
         float spriteHeight)
     {
-        
-        
         ArgumentNullException.ThrowIfNull(animations);
+        ArgumentNullException.ThrowIfNull(movementInput);
 
         if (!float.IsFinite(moveSpeed) || moveSpeed < 0.0f)
+        {
             throw new ArgumentOutOfRangeException(nameof(moveSpeed));
+        }
 
         if (!float.IsFinite(windowWidth) ||
             !float.IsFinite(windowHeight) ||
@@ -75,9 +75,12 @@ internal sealed class PlayerController
                 "Window and sprite dimensions must be finite and positive.");
         }
 
-        if (windowWidth < spriteWidth || windowHeight < spriteHeight)
+        if (windowWidth < spriteWidth ||
+            windowHeight < spriteHeight)
+        {
             throw new ArgumentException(
                 "The sprite must fit inside the game window.");
+        }
 
         if (!float.IsFinite(initialPosition.X) ||
             !float.IsFinite(initialPosition.Y))
@@ -85,11 +88,10 @@ internal sealed class PlayerController
             throw new ArgumentOutOfRangeException(nameof(initialPosition));
         }
 
-
         _animations = animations;
-        _movementInput = movementInput
-                         ?? throw new ArgumentNullException(nameof(movementInput));
+        _movementInput = movementInput;
         _moveSpeed = moveSpeed;
+
         _windowWidth = windowWidth;
         _windowHeight = windowHeight;
         _spriteWidth = spriteWidth;
@@ -101,16 +103,43 @@ internal sealed class PlayerController
         ClampToWindow();
     }
 
+    /// <summary>
+    /// Sets the static rectangular collision obstacles used by this player.
+    /// The supplied rectangles are copied so later collection changes
+    /// do not silently change the controller's collision configuration.
+    /// </summary>
+    public void SetCollisionBounds(
+        IEnumerable<Rectangle> collisionBounds)
+    {
+        ArgumentNullException.ThrowIfNull(collisionBounds);
+
+        Rectangle[] bounds = collisionBounds.ToArray();
+
+        foreach (Rectangle bound in bounds)
+        {
+            if (!float.IsFinite(bound.X) ||
+                !float.IsFinite(bound.Y) ||
+                !float.IsFinite(bound.Width) ||
+                !float.IsFinite(bound.Height))
+            {
+                throw new ArgumentException(
+                    "Collision bounds must contain finite values.",
+                    nameof(collisionBounds));
+            }
+        }
+
+        _collisionBounds = bounds;
+    }
+
     public void Update(float deltaTime)
     {
-        
         if (!float.IsFinite(deltaTime) || deltaTime < 0.0f)
         {
             throw new ArgumentOutOfRangeException(
                 nameof(deltaTime),
                 "Delta time must be finite and non-negative.");
         }
-        
+
         Vector2 movement = _movementInput.GetMovementDirection();
 
         float moveX = movement.X;
@@ -120,19 +149,30 @@ internal sealed class PlayerController
 
         if (moving)
         {
-            float length = MathF.Sqrt(moveX * moveX + moveY * moveY);
+            float length = MathF.Sqrt(
+                moveX * moveX + moveY * moveY);
 
-            moveX /= length;
-            moveY /= length;
+            if (length > 0.0f && float.IsFinite(length))
+            {
+                moveX /= length;
+                moveY /= length;
 
-            Position = new Vector2(
-                Position.X + moveX * _moveSpeed * deltaTime,
-                Position.Y + moveY * _moveSpeed * deltaTime);
+                float deltaX = moveX * _moveSpeed * deltaTime;
+                float deltaY = moveY * _moveSpeed * deltaTime;
 
-            if (moveX < 0.0f)
-                IsFacingLeft = true;
-            else if (moveX > 0.0f)
-                IsFacingLeft = false;
+                // Resolve each axis independently to allow wall sliding.
+                MoveHorizontally(deltaX);
+                MoveVertically(deltaY);
+
+                if (moveX < 0.0f)
+                {
+                    IsFacingLeft = true;
+                }
+                else if (moveX > 0.0f)
+                {
+                    IsFacingLeft = false;
+                }
+            }
         }
 
         ClampToWindow();
@@ -144,6 +184,104 @@ internal sealed class PlayerController
         }
 
         _animations.Update(deltaTime);
+    }
+
+    private void MoveHorizontally(float amount)
+    {
+        if (amount == 0.0f)
+        {
+            return;
+        }
+
+        float halfWidth = _spriteWidth / 2.0f;
+        float halfHeight = _spriteHeight / 2.0f;
+
+        float currentLeft = Position.X - halfWidth;
+        float currentRight = Position.X + halfWidth;
+        float currentTop = Position.Y - halfHeight;
+        float currentBottom = Position.Y + halfHeight;
+
+        float targetX = Position.X + amount;
+
+        foreach (Rectangle obstacle in _collisionBounds)
+        {
+            bool overlapsVertically =
+                currentBottom > obstacle.Top &&
+                currentTop < obstacle.Bottom;
+
+            if (!overlapsVertically)
+            {
+                continue;
+            }
+
+            if (amount > 0.0f &&
+                currentRight <= obstacle.Left &&
+                targetX + halfWidth > obstacle.Left)
+            {
+                targetX = MathF.Min(
+                    targetX,
+                    obstacle.Left - halfWidth);
+            }
+            else if (amount < 0.0f &&
+                     currentLeft >= obstacle.Right &&
+                     targetX - halfWidth < obstacle.Right)
+            {
+                targetX = MathF.Max(
+                    targetX,
+                    obstacle.Right + halfWidth);
+            }
+        }
+
+        Position = new Vector2(targetX, Position.Y);
+    }
+
+    private void MoveVertically(float amount)
+    {
+        if (amount == 0.0f)
+        {
+            return;
+        }
+
+        float halfWidth = _spriteWidth / 2.0f;
+        float halfHeight = _spriteHeight / 2.0f;
+
+        float currentLeft = Position.X - halfWidth;
+        float currentRight = Position.X + halfWidth;
+        float currentTop = Position.Y - halfHeight;
+        float currentBottom = Position.Y + halfHeight;
+
+        float targetY = Position.Y + amount;
+
+        foreach (Rectangle obstacle in _collisionBounds)
+        {
+            bool overlapsHorizontally =
+                currentRight > obstacle.Left &&
+                currentLeft < obstacle.Right;
+
+            if (!overlapsHorizontally)
+            {
+                continue;
+            }
+
+            if (amount > 0.0f &&
+                currentBottom <= obstacle.Top &&
+                targetY + halfHeight > obstacle.Top)
+            {
+                targetY = MathF.Min(
+                    targetY,
+                    obstacle.Top - halfHeight);
+            }
+            else if (amount < 0.0f &&
+                     currentTop >= obstacle.Bottom &&
+                     targetY - halfHeight < obstacle.Bottom)
+            {
+                targetY = MathF.Max(
+                    targetY,
+                    obstacle.Bottom + halfHeight);
+            }
+        }
+
+        Position = new Vector2(Position.X, targetY);
     }
 
     private void ClampToWindow()

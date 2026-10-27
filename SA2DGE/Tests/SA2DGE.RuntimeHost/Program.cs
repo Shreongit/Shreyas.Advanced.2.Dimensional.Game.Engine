@@ -8,6 +8,9 @@ using SA2DGE.Engine.Graphics.Textures;
 using SA2DGE.Engine.Graphics.Shaders;
 using SA2DGE.Engine.Graphics;
 using SA2DGE.Engine.Math;
+using System;
+using System.Collections.Generic;
+using System.Linq;
 
 internal struct Vertex
 {
@@ -64,6 +67,7 @@ internal sealed class RuntimeGame : Game
     private const float SpeedAdjustment = 30.0f;
     private const float MinimumMoveSpeed = 0.0f;
     private const float MaximumMoveSpeed = 600.0f;
+    private readonly List<EnvironmentObject> _environmentObjects = new();
     
 
 
@@ -300,7 +304,34 @@ public override void Initialize()
 
     Console.WriteLine("Stage 3 checkerboard texture created.");
 
+    _environmentObjects.Clear();
+
+    _environmentObjects.Add(
+        new EnvironmentObject(
+            position: new Vector2(400.0f, 250.0f),
+            size: new Vector2(100.0f, 70.0f),
+            color: new Color(160, 90, 45),
+            layer: 1));
+
+    _environmentObjects.Add(
+        new EnvironmentObject(
+            position: new Vector2(600.0f, 450.0f),
+            size: new Vector2(140.0f, 50.0f),
+            color: new Color(110, 110, 120),
+            layer: 1));
+
+    _environmentObjects.Add(
+        new EnvironmentObject(
+            position: new Vector2(950.0f, 200.0f),
+            size: new Vector2(70.0f, 120.0f),
+            color: new Color(70, 140, 80),
+            layer: 1));
     
+    
+    _playerController!.SetCollisionBounds(
+        _environmentObjects
+            .Select(environmentObject => environmentObject.CollisionBounds));
+
    
 
     Console.WriteLine("Stage 3 Renderer2D initialized.");
@@ -798,6 +829,11 @@ public override void Render()
         _renderer!,
         Graphics!.Width,
         Graphics.Height);
+    
+    foreach (EnvironmentObject environmentObject in _environmentObjects)
+    {
+        environmentObject.Draw(_renderer!);
+    }
 
     // Layer 3: Magenta top-left UV region of the test texture.
     
