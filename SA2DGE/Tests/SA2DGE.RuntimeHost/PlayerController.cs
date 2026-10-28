@@ -8,8 +8,8 @@ internal sealed class PlayerController
     private readonly SpriteAnimationController _animations;
     private readonly IPlayerMovementInput _movementInput;
 
-    private readonly float _windowWidth;
-    private readonly float _windowHeight;
+    private float _windowWidth;
+    private float _windowHeight;
     private readonly float _spriteWidth;
     private readonly float _spriteHeight;
 
@@ -283,17 +283,42 @@ internal sealed class PlayerController
 
         Position = new Vector2(Position.X, targetY);
     }
+    
+    public void ResizeWindow(float width, float height)
+    {
+        if (!float.IsFinite(width) ||
+            !float.IsFinite(height) ||
+            width <= 0.0f ||
+            height <= 0.0f)
+        {
+            return;
+        }
 
+        if (width < _spriteWidth || height < _spriteHeight)
+        {
+            return;
+        }
+
+        _windowWidth = width;
+        _windowHeight = height;
+
+        ClampToWindow();
+    }
+
+    
     private void ClampToWindow()
     {
+        float halfWidth = _spriteWidth / 2.0f;
+        float halfHeight = _spriteHeight / 2.0f;
+
+        float minX = halfWidth;
+        float maxX = _windowWidth - halfWidth;
+        float minY = halfHeight;
+        float maxY = _windowHeight - halfHeight;
+
         Position = new Vector2(
-            Math.Clamp(
-                Position.X,
-                _spriteWidth / 2.0f,
-                _windowWidth - _spriteWidth / 2.0f),
-            Math.Clamp(
-                Position.Y,
-                _spriteHeight / 2.0f,
-                _windowHeight - _spriteHeight / 2.0f));
+            Math.Clamp(Position.X, minX, maxX),
+            Math.Clamp(Position.Y, minY, maxY));
     }
+
 }

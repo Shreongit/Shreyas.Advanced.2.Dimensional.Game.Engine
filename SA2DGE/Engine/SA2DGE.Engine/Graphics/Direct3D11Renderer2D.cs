@@ -646,8 +646,8 @@ private void CreateSpritePipeline()
     }
     
     
-    private void UpdateSpriteTransform(
-        RenderCommand command)
+    
+    private void UpdateSpriteTransform(RenderCommand command)
     {
         if (_spriteTransformBuffer is null)
         {
@@ -655,51 +655,38 @@ private void CreateSpritePipeline()
                 "The sprite transform buffer is not initialized.");
         }
 
-        Matrix4 scale =
-            Matrix4.CreateScale(
-                new Vector3(
-                    command.Size.X,
-                    command.Size.Y,
-                    1.0f));
+        float screenWidth = _graphics.Width;
+        float screenHeight = _graphics.Height;
 
-        Matrix4 rotation =
-            Matrix4.CreateRotationZ(
-                command.Rotation);
+        if (!float.IsFinite(screenWidth) ||
+            !float.IsFinite(screenHeight) ||
+            screenWidth <= 0.0f ||
+            screenHeight <= 0.0f)
+        {
+            throw new InvalidOperationException(
+                "Renderer dimensions must be finite and positive.");
+        }
 
-        Matrix4 translation =
-            Matrix4.CreateTranslation(
-                new Vector3(
-                    command.Position.X,
-                    command.Position.Y,
-                    0.0f));
+        float cos = MathF.Cos(command.Rotation);
+        float sin = MathF.Sin(command.Rotation);
 
-        Matrix4 transform =
-            _projectionMatrix
-            * translation
-            * rotation
-            * scale;
+        float sx = command.Size.X;
+        float sy = command.Size.Y;
 
         float[] values =
         {
-            transform.M11,
-            transform.M12,
-            transform.M13,
-            transform.M14,
+            2.0f * cos * sx / screenWidth,
+            -2.0f * sin * sy / screenWidth,
+            0.0f,
+            2.0f * command.Position.X / screenWidth - 1.0f,
 
-            transform.M21,
-            transform.M22,
-            transform.M23,
-            transform.M24,
+            -2.0f * sin * sx / screenHeight,
+            -2.0f * cos * sy / screenHeight,
+            0.0f,
+            1.0f - 2.0f * command.Position.Y / screenHeight,
 
-            transform.M31,
-            transform.M32,
-            transform.M33,
-            transform.M34,
-
-            transform.M41,
-            transform.M42,
-            transform.M43,
-            transform.M44
+            0.0f, 0.0f, 1.0f, 0.0f,
+            0.0f, 0.0f, 0.0f, 1.0f
         };
 
         ReadOnlySpan<byte> bytes =
@@ -707,6 +694,7 @@ private void CreateSpritePipeline()
 
         _spriteTransformBuffer.SetData(bytes);
     }
+
 
 
 

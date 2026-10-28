@@ -67,7 +67,7 @@ internal sealed class RuntimeGame : Game
     private const float SpeedAdjustment = 30.0f;
     private const float MinimumMoveSpeed = 0.0f;
     private const float MaximumMoveSpeed = 600.0f;
-    private readonly List<EnvironmentObject> _environmentObjects = new();
+    private readonly EnvironmentManager _environmentManager = new();
     
 
 
@@ -281,14 +281,22 @@ public override void Initialize()
     _playerController = new PlayerController(
         animations: _animationController,
         movementInput: new KeyboardPlayerMovementInput(Input.Keyboard),
-        initialPosition: new Vector2(850.0f, 350.0f),
+        initialPosition: new Vector2(
+            Graphics!.Width / 2.0f,
+            Graphics.Height / 2.0f),
         moveSpeed: 180.0f,
-        windowWidth: 1280.0f,
-        windowHeight: 720.0f,
+        windowWidth: Graphics.Width,
+        windowHeight: Graphics.Height,
         spriteWidth: 80.0f,
         spriteHeight: 112.0f);
     
-    GenerateEnvironmentObjects();
+    _environmentManager.GenerateRandomized(
+        playerPosition: _playerController.Position,
+        windowWidth: Graphics!.Width,
+        windowHeight: Graphics.Height,
+        seed: 42);
+
+    _environmentManager.SynchronizeCollisionBounds(_playerController);
 
     Console.WriteLine(
         "Stage 4.7.5: Idle, Walk, and Run animations registered.");
@@ -603,108 +611,22 @@ private void TestSpriteAnimation()
 }
 
 
-private void GenerateEnvironmentObjects(int seed = 42)
-{
-    const int obstacleCount = 8;
-    const int maxAttemptsPerObstacle = 200;
-
-    const float windowWidth = 1280.0f;
-    const float windowHeight = 720.0f;
-    const float edgeMargin = 20.0f;
-    const float playerClearance = 40.0f;
-
-    if (_playerController is null)
-    {
-        throw new InvalidOperationException(
-            "The player must be initialized before generating obstacles.");
-    }
-
-    Random random = new(seed);
-
-    _environmentObjects.Clear();
-
-    Rectangle playerBounds = new Rectangle(
-        _playerController.Position.X - 40.0f,
-        _playerController.Position.Y - 56.0f,
-        80.0f,
-        112.0f).Inflate(playerClearance, playerClearance);
-
-    Color[] obstacleColors =
-    {
-        new Color(160, 90, 45),
-        new Color(110, 110, 120),
-        new Color(70, 140, 80),
-        new Color(170, 120, 55)
-    };
-
-    for (int i = 0; i < obstacleCount; i++)
-    {
-        bool placed = false;
-
-        for (int attempt = 0;
-             attempt < maxAttemptsPerObstacle;
-             attempt++)
-        {
-            float width = random.Next(60, 141);
-            float height = random.Next(45, 111);
-
-            float x = random.Next(
-                (int)(edgeMargin + width / 2.0f),
-                (int)(windowWidth - edgeMargin - width / 2.0f));
-
-            float y = random.Next(
-                (int)(edgeMargin + height / 2.0f),
-                (int)(windowHeight - edgeMargin - height / 2.0f));
-
-            EnvironmentObject candidate = new(
-                position: new Vector2(x, y),
-                size: new Vector2(width, height),
-                color: obstacleColors[random.Next(obstacleColors.Length)],
-                layer: 1);
-
-            Rectangle candidateBounds = candidate.CollisionBounds;
-
-            if (candidateBounds.Intersects(playerBounds))
-            {
-                continue;
-            }
-
-            bool overlapsObstacle = _environmentObjects.Any(
-                existing => candidateBounds.Intersects(
-                    existing.CollisionBounds));
-
-            if (overlapsObstacle)
-            {
-                continue;
-            }
-
-            _environmentObjects.Add(candidate);
-            placed = true;
-            break;
-        }
-
-        if (!placed)
-        {
-            Console.WriteLine(
-                $"Could not place obstacle {i + 1} after " +
-                $"{maxAttemptsPerObstacle} attempts.");
-        }
-    }
-
-    _playerController.SetCollisionBounds(
-        _environmentObjects.Select(
-            environmentObject => environmentObject.CollisionBounds));
-
-    Console.WriteLine(
-        $"Generated {_environmentObjects.Count} environment obstacles.");
-}
-
 
 public override void Update(float deltaTime)
 {
     
-    _playerController?.Update(deltaTime);
+    
+    if (_playerController is not null && Graphics is not null)
+    {
+        _playerController.ResizeWindow(
+            Graphics.Width,
+            Graphics.Height);
+
+        _playerController.Update(deltaTime);
+    }
+
     _testAnimation = _playerController?.CurrentAnimation;
+
     
     
     if (_playerController is not null)
@@ -878,14 +800,22 @@ public override void Update(float deltaTime)
     }
 }
 
-public override void OnWindowEvent(
-    WindowEvent windowEvent)
+public override void OnWindowEvent(WindowEvent windowEvent)
 {
     base.OnWindowEvent(windowEvent);
 
     Console.WriteLine(
         $"Window Event: {windowEvent.Type} " +
         $"({windowEvent.Width}x{windowEvent.Height})");
+
+    if (_playerController is not null &&
+        windowEvent.Width > 0 &&
+        windowEvent.Height > 0)
+    {
+        _playerController.ResizeWindow(
+            windowEvent.Width,
+            windowEvent.Height);
+    }
 }
 
 
@@ -902,10 +832,7 @@ public override void Render()
         Graphics!.Width,
         Graphics.Height);
     
-    foreach (EnvironmentObject environmentObject in _environmentObjects)
-    {
-        environmentObject.Draw(_renderer!);
-    }
+    _environmentManager.Draw(_renderer!);
 
     // Layer 3: Magenta top-left UV region of the test texture.
     
