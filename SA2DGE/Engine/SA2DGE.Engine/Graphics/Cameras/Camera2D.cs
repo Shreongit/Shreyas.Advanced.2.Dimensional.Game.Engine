@@ -4,45 +4,83 @@ namespace SA2DGE.Engine.Graphics.Cameras;
 
 public sealed class Camera2D : Camera
 {
-    public float Width { get; set; }
+    private float _width;
+    private float _height;
+    private float _zoom = 1.0f;
+    private float _rotation;
 
-    public float Height { get; set; }
+    public float Width
+    {
+        get => _width;
+        set
+        {
+            if (!float.IsFinite(value) || value <= 0.0f)
+                throw new ArgumentOutOfRangeException(nameof(value));
 
-    public float Zoom { get; set; }
+            _width = value;
+            Update();
+        }
+    }
 
-    public float Rotation { get; set; }
+    public float Height
+    {
+        get => _height;
+        set
+        {
+            if (!float.IsFinite(value) || value <= 0.0f)
+                throw new ArgumentOutOfRangeException(nameof(value));
+
+            _height = value;
+            Update();
+        }
+    }
+
+    public float Zoom
+    {
+        get => _zoom;
+        set
+        {
+            if (!float.IsFinite(value) || value <= 0.0f)
+                throw new ArgumentOutOfRangeException(nameof(value));
+
+            _zoom = value;
+            Update();
+        }
+    }
+
+    public float Rotation
+    {
+        get => _rotation;
+        set
+        {
+            if (!float.IsFinite(value))
+                throw new ArgumentOutOfRangeException(nameof(value));
+
+            _rotation = value;
+            Update();
+        }
+    }
 
     public bool PixelPerfect { get; set; }
 
-    public Camera2D(
-        float width,
-        float height)
+    public Camera2D(float width, float height)
     {
-        if (width <= 0.0f)
-        {
-            throw new ArgumentOutOfRangeException(
-                nameof(width));
-        }
+        if (!float.IsFinite(width) || width <= 0.0f)
+            throw new ArgumentOutOfRangeException(nameof(width));
 
-        if (height <= 0.0f)
-        {
-            throw new ArgumentOutOfRangeException(
-                nameof(height));
-        }
+        if (!float.IsFinite(height) || height <= 0.0f)
+            throw new ArgumentOutOfRangeException(nameof(height));
 
-        Width = width;
-        Height = height;
-        Zoom = 1.0f;
-        Rotation = 0.0f;
+        _width = width;
+        _height = height;
+        _zoom = 1.0f;
+        _rotation = 0.0f;
         PixelPerfect = false;
 
-        Position = new Vector3(
-            0.0f,
-            0.0f,
-            1.0f);
+        Position = new Vector3(0.0f, 0.0f, 1.0f);
 
         Target = Vector3.Zero;
-        Up = Vector3.UnitY;
+        Up = -Vector3.UnitY;
 
         Update();
     }
@@ -130,5 +168,17 @@ public sealed class Camera2D : Camera
                 halfHeight,
                 -1.0f,
                 1.0f));
+    }
+    protected override void UpdateViewMatrix()
+    {
+        float cos = MathF.Cos(Rotation);
+        float sin = MathF.Sin(Rotation);
+
+        Vector3 rotatedUp = new Vector3(
+            Up.X * cos - Up.Y * sin,
+            Up.X * sin + Up.Y * cos,
+            Up.Z);
+
+        SetViewMatrixFromUp(rotatedUp);
     }
 }

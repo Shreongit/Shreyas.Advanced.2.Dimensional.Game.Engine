@@ -7,24 +7,52 @@ public abstract class Camera
     private Matrix4 _viewMatrix;
     private Matrix4 _projectionMatrix;
 
-    public Vector3 Position { get; set; }
+    private Vector3 _position;
+    private Vector3 _target;
+    private Vector3 _up;
 
-    public Vector3 Target { get; set; }
+    public Vector3 Position
+    {
+        get => _position;
+        set
+        {
+            _position = value;
+            UpdateViewMatrix();
+        }
+    }
 
-    public Vector3 Up { get; set; }
+    public Vector3 Target
+    {
+        get => _target;
+        set
+        {
+            _target = value;
+            UpdateViewMatrix();
+        }
+    }
+
+    public Vector3 Up
+    {
+        get => _up;
+        set
+        {
+            _up = value;
+            UpdateViewMatrix();
+        }
+    }
 
     public Matrix4 ViewMatrix => _viewMatrix;
 
     public Matrix4 ProjectionMatrix => _projectionMatrix;
 
     public Matrix4 ViewProjectionMatrix =>
-        _viewMatrix * _projectionMatrix;
-
+        _projectionMatrix * _viewMatrix;
+    
     protected Camera()
     {
-        Position = new Vector3(0.0f, 0.0f, 1.0f);
-        Target = Vector3.Zero;
-        Up = Vector3.UnitY;
+        _position = new Vector3(0.0f, 0.0f, 1.0f);
+        _target = Vector3.Zero;
+        _up = Vector3.UnitY;
 
         _viewMatrix = Matrix4.Identity;
         _projectionMatrix = Matrix4.Identity;
@@ -68,11 +96,16 @@ public abstract class Camera
 
     protected virtual void UpdateViewMatrix()
     {
+        SetViewMatrixFromUp(Up);
+    }
+
+    protected void SetViewMatrixFromUp(Vector3 up)
+    {
         _viewMatrix =
             CreateLookAt(
                 Position,
                 Target,
-                Up);
+                up);
     }
 
     protected abstract void UpdateProjectionMatrix();
