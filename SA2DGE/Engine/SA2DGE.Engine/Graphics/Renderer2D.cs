@@ -1,10 +1,17 @@
 using SA2DGE.Engine.Math;
 
 namespace SA2DGE.Engine.Graphics;
+using SA2DGE.Engine.Graphics.Cameras;
 
 public abstract class Renderer2D : Renderer
 {
     private readonly RenderQueue _renderQueue = new();
+    
+    /// <summary>
+    /// Gets or sets the active 2D camera used by the renderer.
+    /// Null preserves the existing screen-space rendering behavior.
+    /// </summary>
+    public Camera2D? Camera { get; set; }
 
     public override string Name => "SA2DGE Renderer2D";
 
@@ -29,7 +36,8 @@ public abstract class Renderer2D : Renderer
         bool flipHorizontal = false,
         bool flipVertical = false,
         Vector2? uvOffset = null,
-        Vector2? uvSize = null)
+        Vector2? uvSize = null,
+        CoordinateSpace space = CoordinateSpace.Screen)
     {
         Draw(
             RenderCommand.Sprite(
@@ -42,7 +50,8 @@ public abstract class Renderer2D : Renderer
                 flipHorizontal,
                 flipVertical,
                 uvOffset,
-                uvSize));
+                uvSize,
+                space));
                 
     }
     
@@ -57,7 +66,8 @@ public abstract class Renderer2D : Renderer
         float rotation = 0.0f,
         int layer = 0,
         bool flipHorizontal = false,
-        bool flipVertical = false)
+        bool flipVertical = false,
+        CoordinateSpace space = CoordinateSpace.Screen)
     {
         ArgumentNullException.ThrowIfNull(spriteSheet);
 
@@ -74,7 +84,8 @@ public abstract class Renderer2D : Renderer
             flipHorizontal,
             flipVertical,
             uvOffset,
-            spriteSheet.FrameUVSize);
+            spriteSheet.FrameUVSize,
+            space);
     }
 
 
@@ -84,7 +95,8 @@ public abstract class Renderer2D : Renderer
         Vector2 size,
         Color color,
         int layer = 0,
-        float rotation = 0.0f)
+        float rotation = 0.0f,
+        CoordinateSpace space = CoordinateSpace.Screen)
     {
         Draw(
             RenderCommand.Rectangle(
@@ -92,7 +104,8 @@ public abstract class Renderer2D : Renderer
                 size,
                 color,
                 layer,
-                rotation));
+                rotation,
+                space));
     }
 
 

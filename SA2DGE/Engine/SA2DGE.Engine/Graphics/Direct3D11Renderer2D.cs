@@ -599,101 +599,177 @@ private void CreateSpritePipeline()
 
 
     
-    private void UpdateRectangleTransform(RenderCommand command)
+   
+private void UpdateRectangleTransform(RenderCommand command)
+{
+    if (_rectangleTransformBuffer is null)
     {
-        if (_rectangleTransformBuffer is null)
-        {
-            throw new InvalidOperationException(
-                "The rectangle transform buffer is not initialized.");
-        }
-
-        if (_graphics.Width <= 0 || _graphics.Height <= 0)
-        {
-            throw new InvalidOperationException(
-                "Renderer dimensions must be positive.");
-        }
-
-        float cos = MathF.Cos(command.Rotation);
-        float sin = MathF.Sin(command.Rotation);
-
-        float sx = command.Size.X;
-        float sy = command.Size.Y;
-
-        float screenWidth = _graphics.Width;
-        float screenHeight = _graphics.Height;
-
-        // Row-major CPU matrix. The shader below uses mul(vector, matrix).
-        float[] values =
-        {
-            2.0f * cos * sx / screenWidth,
-            -2.0f * sin * sy / screenWidth,
-            0.0f,
-            2.0f * command.Position.X / screenWidth - 1.0f,
-
-            -2.0f * sin * sx / screenHeight,
-            -2.0f * cos * sy / screenHeight,
-            0.0f,
-            1.0f - 2.0f * command.Position.Y / screenHeight,
-
-            0.0f, 0.0f, 1.0f, 0.0f,
-            0.0f, 0.0f, 0.0f, 1.0f
-        };
-
-        ReadOnlySpan<byte> bytes =
-            MemoryMarshal.AsBytes<float>(values);
-
-        _rectangleTransformBuffer.SetData(bytes);
+        throw new InvalidOperationException(
+            "The rectangle transform buffer is not initialized.");
     }
-    
-    
-    
-    private void UpdateSpriteTransform(RenderCommand command)
+
+    float screenWidth = _graphics.Width;
+    float screenHeight = _graphics.Height;
+
+    if (!float.IsFinite(screenWidth) ||
+        !float.IsFinite(screenHeight) ||
+        screenWidth <= 0.0f ||
+        screenHeight <= 0.0f)
     {
-        if (_spriteTransformBuffer is null)
-        {
-            throw new InvalidOperationException(
-                "The sprite transform buffer is not initialized.");
-        }
-
-        float screenWidth = _graphics.Width;
-        float screenHeight = _graphics.Height;
-
-        if (!float.IsFinite(screenWidth) ||
-            !float.IsFinite(screenHeight) ||
-            screenWidth <= 0.0f ||
-            screenHeight <= 0.0f)
-        {
-            throw new InvalidOperationException(
-                "Renderer dimensions must be finite and positive.");
-        }
-
-        float cos = MathF.Cos(command.Rotation);
-        float sin = MathF.Sin(command.Rotation);
-
-        float sx = command.Size.X;
-        float sy = command.Size.Y;
-
-        float[] values =
-        {
-            2.0f * cos * sx / screenWidth,
-            -2.0f * sin * sy / screenWidth,
-            0.0f,
-            2.0f * command.Position.X / screenWidth - 1.0f,
-
-            -2.0f * sin * sx / screenHeight,
-            -2.0f * cos * sy / screenHeight,
-            0.0f,
-            1.0f - 2.0f * command.Position.Y / screenHeight,
-
-            0.0f, 0.0f, 1.0f, 0.0f,
-            0.0f, 0.0f, 0.0f, 1.0f
-        };
-
-        ReadOnlySpan<byte> bytes =
-            MemoryMarshal.AsBytes<float>(values);
-
-        _spriteTransformBuffer.SetData(bytes);
+        throw new InvalidOperationException(
+            "Renderer dimensions must be finite and positive.");
     }
+
+    float positionX = command.Position.X;
+    float positionY = command.Position.Y;
+
+    float sx = command.Size.X;
+    float sy = command.Size.Y;
+
+    float rotation = command.Rotation;
+
+    // Apply the camera only to world-space rectangles.
+    if (command.Space == CoordinateSpace.World)
+    {
+        if (Camera is null)
+        {
+            throw new InvalidOperationException(
+                "World-space rectangle rendering requires an active Camera2D.");
+        }
+
+        if (MathF.Abs(Camera.Width - screenWidth) > 0.001f ||
+            MathF.Abs(Camera.Height - screenHeight) > 0.001f)
+        {
+            throw new InvalidOperationException(
+                "Camera viewport dimensions must match renderer dimensions.");
+        }
+
+        // Convert world position into screen position.
+        Vector2 screenPosition =
+            Camera.WorldToScreen(command.Position);
+
+        positionX = screenPosition.X;
+        positionY = screenPosition.Y;
+
+        // Apply camera zoom to rectangle dimensions.
+        sx *= Camera.Zoom;
+        sy *= Camera.Zoom;
+
+        // Apply camera rotation consistently with sprite rendering.
+        rotation -= Camera.Rotation;
+    }
+
+    float cos = MathF.Cos(rotation);
+    float sin = MathF.Sin(rotation);
+
+    // Row-major CPU matrix.
+    // The vertex shader uses mul(vector, matrix).
+    float[] values =
+    {
+        2.0f * cos * sx / screenWidth,
+        -2.0f * sin * sy / screenWidth,
+        0.0f,
+        2.0f * positionX / screenWidth - 1.0f,
+
+        -2.0f * sin * sx / screenHeight,
+        -2.0f * cos * sy / screenHeight,
+        0.0f,
+        1.0f - 2.0f * positionY / screenHeight,
+
+        0.0f, 0.0f, 1.0f, 0.0f,
+        0.0f, 0.0f, 0.0f, 1.0f
+    };
+
+    ReadOnlySpan<byte> bytes =
+        MemoryMarshal.AsBytes<float>(values);
+
+    _rectangleTransformBuffer.SetData(bytes);
+}
+    
+    
+    
+   
+private void UpdateSpriteTransform(RenderCommand command)
+{
+    if (_spriteTransformBuffer is null)
+    {
+        throw new InvalidOperationException(
+            "The sprite transform buffer is not initialized.");
+    }
+
+    float screenWidth = _graphics.Width;
+    float screenHeight = _graphics.Height;
+
+    if (!float.IsFinite(screenWidth) ||
+        !float.IsFinite(screenHeight) ||
+        screenWidth <= 0.0f ||
+        screenHeight <= 0.0f)
+    {
+        throw new InvalidOperationException(
+            "Renderer dimensions must be finite and positive.");
+    }
+
+    float positionX = command.Position.X;
+    float positionY = command.Position.Y;
+
+    float sx = command.Size.X;
+    float sy = command.Size.Y;
+
+    float rotation = command.Rotation;
+
+    // Apply the camera only to world-space commands.
+    if (command.Space == CoordinateSpace.World)
+    {
+        if (Camera is null)
+        {
+            throw new InvalidOperationException(
+                "World-space sprite rendering requires an active Camera2D.");
+        }
+
+        if (MathF.Abs(Camera.Width - screenWidth) > 0.001f ||
+            MathF.Abs(Camera.Height - screenHeight) > 0.001f)
+        {
+            throw new InvalidOperationException(
+                "Camera viewport dimensions must match renderer dimensions.");
+        }
+
+        Vector2 screenPosition =
+            Camera.WorldToScreen(command.Position);
+
+        positionX = screenPosition.X;
+        positionY = screenPosition.Y;
+
+        sx *= Camera.Zoom;
+        sy *= Camera.Zoom;
+
+        rotation -= Camera.Rotation;
+    }
+
+    float cos = MathF.Cos(rotation);
+    float sin = MathF.Sin(rotation);
+
+    float[] values =
+    {
+        2.0f * cos * sx / screenWidth,
+        -2.0f * sin * sy / screenWidth,
+        0.0f,
+        2.0f * positionX / screenWidth - 1.0f,
+
+        -2.0f * sin * sx / screenHeight,
+        -2.0f * cos * sy / screenHeight,
+        0.0f,
+        1.0f - 2.0f * positionY / screenHeight,
+
+        0.0f, 0.0f, 1.0f, 0.0f,
+        0.0f, 0.0f, 0.0f, 1.0f
+    };
+
+    ReadOnlySpan<byte> bytes =
+        MemoryMarshal.AsBytes<float>(values);
+
+    _spriteTransformBuffer.SetData(bytes);
+}
+
 
 
 

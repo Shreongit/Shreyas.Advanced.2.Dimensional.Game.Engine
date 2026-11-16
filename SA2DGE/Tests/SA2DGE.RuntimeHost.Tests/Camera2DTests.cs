@@ -382,6 +382,290 @@ public sealed class Camera2DTests
             0.0f,
             Tolerance);
     }
+    
+    [Fact]
+    public void ViewProjectionMatrix_ConsistentWithCameraRotation()
+    {
+        // Arrange
+        var camera = new Camera2D(1280.0f, 720.0f);
 
+        camera.Rotation = MathF.PI / 6.0f; // 30 degrees
+
+        Vector2 worldPosition = new(100.0f, 50.0f);
+
+        // Act: Direct transformation
+        Vector2 expectedScreenPosition =
+            camera.WorldToScreen(worldPosition);
+
+        // Act: Matrix transformation
+        Vector3 clipPosition = Matrix4.Transform(
+            new Vector3(worldPosition.X, worldPosition.Y, 0.0f),
+            camera.ViewProjectionMatrix);
+
+        float actualScreenX =
+            (clipPosition.X + 1.0f) * camera.Width * 0.5f;
+
+        float actualScreenY =
+            (1.0f - clipPosition.Y) * camera.Height * 0.5f;
+
+        // Assert
+        Assert.InRange(
+            MathF.Abs(actualScreenX - expectedScreenPosition.X),
+            0.0f,
+            Tolerance);
+
+        Assert.InRange(
+            MathF.Abs(actualScreenY - expectedScreenPosition.Y),
+            0.0f,
+            Tolerance);
+    }
+    
+    [Fact]
+    public void ViewProjectionMatrix_ConsistentWithCameraZoom()
+    {
+        // Arrange
+        var camera = new Camera2D(1280.0f, 720.0f);
+
+        camera.Zoom = 2.0f;
+
+        Vector2 worldPosition = new(100.0f, 50.0f);
+
+        // Act: Direct transformation
+        Vector2 expectedScreenPosition =
+            camera.WorldToScreen(worldPosition);
+
+        // Act: Matrix transformation
+        Vector3 clipPosition = Matrix4.Transform(
+            new Vector3(worldPosition.X, worldPosition.Y, 0.0f),
+            camera.ViewProjectionMatrix);
+
+        float actualScreenX =
+            (clipPosition.X + 1.0f) * camera.Width * 0.5f;
+
+        float actualScreenY =
+            (1.0f - clipPosition.Y) * camera.Height * 0.5f;
+
+        // Assert
+        Assert.InRange(
+            MathF.Abs(actualScreenX - expectedScreenPosition.X),
+            0.0f,
+            Tolerance);
+
+        Assert.InRange(
+            MathF.Abs(actualScreenY - expectedScreenPosition.Y),
+            0.0f,
+            Tolerance);
+    }
+    
+    [Fact]
+    public void ViewProjectionMatrix_ConsistentWithViewportDimensions()
+    {
+        // Arrange
+        var camera = new Camera2D(1280.0f, 720.0f);
+
+        camera.Width = 1920.0f;
+        camera.Height = 1080.0f;
+
+        Vector2 worldPosition = new(100.0f, 50.0f);
+
+        // Act: Direct transformation
+        Vector2 expectedScreenPosition =
+            camera.WorldToScreen(worldPosition);
+
+        // Act: Matrix transformation
+        Vector3 clipPosition = Matrix4.Transform(
+            new Vector3(worldPosition.X, worldPosition.Y, 0.0f),
+            camera.ViewProjectionMatrix);
+
+        float actualScreenX =
+            (clipPosition.X + 1.0f) * camera.Width * 0.5f;
+
+        float actualScreenY =
+            (1.0f - clipPosition.Y) * camera.Height * 0.5f;
+
+        // Assert
+        Assert.InRange(
+            MathF.Abs(actualScreenX - expectedScreenPosition.X),
+            0.0f,
+            Tolerance);
+
+        Assert.InRange(
+            MathF.Abs(actualScreenY - expectedScreenPosition.Y),
+            0.0f,
+            Tolerance);
+    }
+    
+    [Fact]
+    public void Follow_MovesCameraToTargetPosition()
+    {
+        // Arrange
+        var camera = new Camera2D(1280.0f, 720.0f);
+
+        Vector2 targetPosition = new(500.0f, 300.0f);
+
+        // Act
+        camera.Follow(targetPosition);
+
+        // Assert: Camera position
+        Assert.InRange(
+            MathF.Abs(camera.Position.X - 500.0f),
+            0.0f,
+            Tolerance);
+
+        Assert.InRange(
+            MathF.Abs(camera.Position.Y - 300.0f),
+            0.0f,
+            Tolerance);
+
+        // Assert: Camera target
+        Assert.InRange(
+            MathF.Abs(camera.Target.X - 500.0f),
+            0.0f,
+            Tolerance);
+
+        Assert.InRange(
+            MathF.Abs(camera.Target.Y - 300.0f),
+            0.0f,
+            Tolerance);
+
+        // Assert: Camera depth remains unchanged
+        Assert.InRange(
+            MathF.Abs(camera.Position.Z - 1.0f),
+            0.0f,
+            Tolerance);
+
+        Assert.InRange(
+            MathF.Abs(camera.Target.Z),
+            0.0f,
+            Tolerance);
+
+        // Assert: Follow target remains at viewport centre
+        Vector2 screenPosition =
+            camera.WorldToScreen(targetPosition);
+
+        Assert.InRange(
+            MathF.Abs(screenPosition.X - 640.0f),
+            0.0f,
+            Tolerance);
+
+        Assert.InRange(
+            MathF.Abs(screenPosition.Y - 360.0f),
+            0.0f,
+            Tolerance);
+    }
+    
+    [Fact]
+    public void Follow_DefaultOffset_KeepsTargetAtViewportCenter()
+    {
+        var camera = new Camera2D(1280.0f, 720.0f);
+
+        Vector2 targetPosition = new(500.0f, 300.0f);
+
+        camera.Follow(targetPosition);
+
+        Vector2 screenPosition = camera.WorldToScreen(targetPosition);
+
+        Assert.InRange(
+            MathF.Abs(screenPosition.X - 640.0f),
+            0.0f,
+            Tolerance);
+
+        Assert.InRange(
+            MathF.Abs(screenPosition.Y - 360.0f),
+            0.0f,
+            Tolerance);
+    }
+    
+    [Fact]
+    public void Follow_HorizontalOffset_ShiftsTargetOnScreen()
+    {
+        var camera = new Camera2D(1280.0f, 720.0f)
+        {
+            FollowOffset = new Vector2(-150.0f, 0.0f)
+        };
+
+        Vector2 targetPosition = new(500.0f, 300.0f);
+
+        camera.Follow(targetPosition);
+
+        Vector2 screenPosition = camera.WorldToScreen(targetPosition);
+
+        Assert.InRange(
+            MathF.Abs(screenPosition.X - 490.0f),
+            0.0f,
+            Tolerance);
+
+        Assert.InRange(
+            MathF.Abs(screenPosition.Y - 360.0f),
+            0.0f,
+            Tolerance);
+    }
+    
+    [Fact]
+    public void Follow_VerticalOffset_ShiftsTargetOnScreen()
+    {
+        var camera = new Camera2D(1280.0f, 720.0f)
+        {
+            FollowOffset = new Vector2(0.0f, 100.0f)
+        };
+
+        Vector2 targetPosition = new(500.0f, 300.0f);
+
+        camera.Follow(targetPosition);
+
+        Vector2 screenPosition = camera.WorldToScreen(targetPosition);
+
+        Assert.InRange(
+            MathF.Abs(screenPosition.X - 640.0f),
+            0.0f,
+            Tolerance);
+
+        Assert.InRange(
+            MathF.Abs(screenPosition.Y - 460.0f),
+            0.0f,
+            Tolerance);
+    }
+    
+    [Fact]
+    public void Follow_WithOffset_ViewProjectionMatchesWorldToScreen()
+    {
+        var camera = new Camera2D(1280.0f, 720.0f)
+        {
+            FollowOffset = new Vector2(-100.0f, 50.0f),
+            Zoom = 1.5f,
+            Rotation = MathF.PI / 6.0f
+        };
+
+        Vector2 targetPosition = new(500.0f, 300.0f);
+
+        camera.Follow(targetPosition);
+
+        // Direct coordinate transformation
+        Vector2 directScreenPosition =
+            camera.WorldToScreen(targetPosition);
+
+        // Matrix-based transformation
+        Vector3 clipPosition = Matrix4.Transform(
+            new Vector3(targetPosition.X, targetPosition.Y, 0.0f),
+            camera.ViewProjectionMatrix);
+
+        float matrixScreenX =
+            (clipPosition.X + 1.0f) * camera.Width / 2.0f;
+
+        float matrixScreenY =
+            (1.0f - clipPosition.Y) * camera.Height / 2.0f;
+
+        // Compare both transformation paths
+        Assert.InRange(
+            MathF.Abs(matrixScreenX - directScreenPosition.X),
+            0.0f,
+            Tolerance);
+
+        Assert.InRange(
+            MathF.Abs(matrixScreenY - directScreenPosition.Y),
+            0.0f,
+            Tolerance);
+    }
+    
 
 }

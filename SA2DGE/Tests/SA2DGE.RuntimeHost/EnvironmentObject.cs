@@ -64,6 +64,7 @@ internal sealed class EnvironmentObject
             position: Position,
             size: Size,
             color: Color,
-            layer: Layer);
+            layer: Layer,
+            space: CoordinateSpace.World);
     }
 }

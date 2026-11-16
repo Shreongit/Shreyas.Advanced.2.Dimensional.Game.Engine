@@ -1,3 +1,4 @@
+
 using SA2DGE.Engine.Math;
 
 namespace SA2DGE.Engine.Graphics;
@@ -9,13 +10,13 @@ public readonly struct RenderCommand
     public Vector2 Position { get; }
 
     public Vector2 Size { get; }
-    
+
     public Vector2 UVOffset { get; }
 
     public Vector2 UVSize { get; }
 
     public float Rotation { get; }
-    
+
     public bool FlipHorizontal { get; }
 
     public bool FlipVertical { get; }
@@ -25,6 +26,8 @@ public readonly struct RenderCommand
     public int Layer { get; }
 
     public object? Resource { get; }
+
+    public CoordinateSpace Space { get; }
 
     public RenderCommand(
         RenderCommandType type,
@@ -37,7 +40,8 @@ public readonly struct RenderCommand
         bool flipHorizontal = false,
         bool flipVertical = false,
         Vector2? uvOffset = null,
-        Vector2? uvSize = null)
+        Vector2? uvSize = null,
+        CoordinateSpace space = CoordinateSpace.Screen)
     {
         Type = type;
         Position = position;
@@ -50,6 +54,7 @@ public readonly struct RenderCommand
         Color = color;
         Layer = layer;
         Resource = resource;
+        Space = space;
     }
 
     public static RenderCommand Sprite(
@@ -62,7 +67,8 @@ public readonly struct RenderCommand
         bool flipHorizontal = false,
         bool flipVertical = false,
         Vector2? uvOffset = null,
-        Vector2? uvSize = null)
+        Vector2? uvSize = null,
+        CoordinateSpace space = CoordinateSpace.Screen)
     {
         return new RenderCommand(
             RenderCommandType.Sprite,
@@ -75,16 +81,17 @@ public readonly struct RenderCommand
             flipHorizontal,
             flipVertical,
             uvOffset,
-            uvSize);
+            uvSize,
+            space);
     }
 
-    
     public static RenderCommand Rectangle(
         Vector2 position,
         Vector2 size,
         Color color,
         int layer = 0,
-        float rotation = 0.0f)
+        float rotation = 0.0f,
+        CoordinateSpace space = CoordinateSpace.Screen)
     {
         return new RenderCommand(
             RenderCommandType.Rectangle,
@@ -92,9 +99,9 @@ public readonly struct RenderCommand
             size,
             rotation,
             color,
-            layer);
+            layer,
+            space: space);
     }
-
 
     public static RenderCommand Circle(
         Vector2 position,
@@ -157,4 +164,10 @@ public enum RenderCommandType
     Circle,
     Line,
     Text
+}
+
+public enum CoordinateSpace
+{
+    Screen,
+    World
 }

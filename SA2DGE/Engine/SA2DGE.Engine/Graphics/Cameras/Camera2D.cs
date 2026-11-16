@@ -60,6 +60,8 @@ public sealed class Camera2D : Camera
             Update();
         }
     }
+    
+    public Vector2 FollowOffset { get; set; } = Vector2.Zero;
 
     public bool PixelPerfect { get; set; }
 
@@ -180,5 +182,45 @@ public sealed class Camera2D : Camera
             Up.Z);
 
         SetViewMatrixFromUp(rotatedUp);
+    }
+    
+    /// <summary>
+    /// Moves the camera to follow a world-space position
+    /// while preserving its current viewing direction.
+    /// Call this method with the latest target position
+    /// during each update.
+    /// </summary>
+    public void Follow(Vector2 targetPosition)
+    {
+        if (!float.IsFinite(targetPosition.X) ||
+            !float.IsFinite(targetPosition.Y))
+        {
+            throw new ArgumentOutOfRangeException(
+                nameof(targetPosition),
+                "Follow target coordinates must be finite.");
+        }
+
+        float cos = MathF.Cos(Rotation);
+        float sin = MathF.Sin(Rotation);
+
+        // Convert the desired screen-space offset
+        // into a world-space camera offset.
+        Vector2 rotatedOffset = new(
+            (FollowOffset.X * cos - FollowOffset.Y * sin) / Zoom,
+            (FollowOffset.X * sin + FollowOffset.Y * cos) / Zoom);
+
+        Vector2 cameraPosition = new(
+            targetPosition.X - rotatedOffset.X,
+            targetPosition.Y - rotatedOffset.Y);
+
+        Position = new Vector3(
+            cameraPosition.X,
+            cameraPosition.Y,
+            Position.Z);
+
+        Target = new Vector3(
+            cameraPosition.X,
+            cameraPosition.Y,
+            Target.Z);
     }
 }

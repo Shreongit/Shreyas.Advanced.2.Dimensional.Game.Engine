@@ -7,6 +7,7 @@ using SA2DGE.Engine.Graphics.Buffers;
 using SA2DGE.Engine.Graphics.Textures;
 using SA2DGE.Engine.Graphics.Shaders;
 using SA2DGE.Engine.Graphics;
+using SA2DGE.Engine.Graphics.Cameras;
 using SA2DGE.Engine.Math;
 using System;
 using System.Collections.Generic;
@@ -56,6 +57,7 @@ internal sealed class RuntimeGame : Game
     private Shader? _fragmentShader;
     private ShaderProgram? _shaderProgram;
     private Direct3D11Renderer2D? _renderer;
+    private Camera2D? _camera;
     private Texture2D? _testTexture;
     private SpriteSheet? _testSpriteSheet;
     private Texture2D? _soldierTexture;
@@ -147,6 +149,14 @@ public override void Initialize()
     
     _renderer = new Direct3D11Renderer2D(Graphics!);
     _renderer.Initialize();
+    
+    _camera = new Camera2D(
+        Graphics!.Width,
+        Graphics.Height);
+
+    _camera.FollowOffset = Vector2.Zero;
+
+    _renderer.Camera = _camera;
     
     
     const int textureSize = 64;
@@ -289,6 +299,8 @@ public override void Initialize()
         windowHeight: Graphics.Height,
         spriteWidth: 80.0f,
         spriteHeight: 112.0f);
+    
+    _camera!.Follow(_playerController.Position);
     
     _environmentManager.GenerateRandomized(
         playerPosition: _playerController.Position,
@@ -624,6 +636,16 @@ public override void Update(float deltaTime)
 
         _playerController.Update(deltaTime);
     }
+    
+    if (_camera is not null &&
+        _playerController is not null &&
+        Graphics is not null)
+    {
+        _camera.Width = Graphics.Width;
+        _camera.Height = Graphics.Height;
+
+        _camera.Follow(_playerController.Position);
+    }
 
     _testAnimation = _playerController?.CurrentAnimation;
 
@@ -848,7 +870,8 @@ public override void Render()
             spriteSheet: _soldierSpriteSheet,
             frameIndex: _playerController.CurrentFrame,
             layer: 3,
-            flipHorizontal: _playerController.IsFacingLeft);
+            flipHorizontal: _playerController.IsFacingLeft,
+            space: CoordinateSpace.World);
     }
     _renderer.EndFrame();
     _renderer.Present();
