@@ -223,4 +223,69 @@ public sealed class Camera2D : Camera
             cameraPosition.Y,
             Target.Z);
     }
+    
+    /// <summary>
+    /// Follows a target while keeping the camera inside
+    /// the specified world boundaries.
+    /// </summary>
+    public void FollowWithinBounds(
+        Vector2 targetPosition,
+        float worldWidth,
+        float worldHeight)
+    {
+        if (!float.IsFinite(worldWidth) ||
+            !float.IsFinite(worldHeight) ||
+            worldWidth <= 0.0f ||
+            worldHeight <= 0.0f)
+        {
+            throw new ArgumentOutOfRangeException(
+                nameof(worldWidth),
+                "World dimensions must be finite and positive.");
+        }
+
+        // First calculate the normal follow position.
+        Follow(targetPosition);
+
+        // Calculate the visible half-size in world coordinates.
+        float halfWidth = Width / (2.0f * Zoom);
+        float halfHeight = Height / (2.0f * Zoom);
+
+        // Account for camera rotation when calculating boundaries.
+        float cos = MathF.Abs(MathF.Cos(Rotation));
+        float sin = MathF.Abs(MathF.Sin(Rotation));
+
+        float extentX =
+            cos * halfWidth + sin * halfHeight;
+
+        float extentY =
+            sin * halfWidth + cos * halfHeight;
+
+        // Calculate valid camera center positions.
+        float minX = extentX;
+        float maxX = worldWidth - extentX;
+
+        float minY = extentY;
+        float maxY = worldHeight - extentY;
+
+        // If the viewport is larger than the world,
+        // center the camera on that axis.
+        float cameraX = minX > maxX
+            ? worldWidth * 0.5f
+            : System.Math.Clamp(Position.X, minX, maxX);
+
+        float cameraY = minY > maxY
+            ? worldHeight * 0.5f
+            : System.Math.Clamp(Position.Y, minY, maxY);
+
+        // Update camera position and target together.
+        Position = new Vector3(
+            cameraX,
+            cameraY,
+            Position.Z);
+
+        Target = new Vector3(
+            cameraX,
+            cameraY,
+            Target.Z);
+    }
 }

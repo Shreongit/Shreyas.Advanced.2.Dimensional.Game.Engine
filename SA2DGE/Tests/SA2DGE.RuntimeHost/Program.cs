@@ -69,6 +69,8 @@ internal sealed class RuntimeGame : Game
     private const float SpeedAdjustment = 30.0f;
     private const float MinimumMoveSpeed = 0.0f;
     private const float MaximumMoveSpeed = 600.0f;
+    private const float WorldWidth = 3840.0f;
+    private const float WorldHeight = 2160.0f;
     private readonly EnvironmentManager _environmentManager = new();
     
 
@@ -292,20 +294,22 @@ public override void Initialize()
         animations: _animationController,
         movementInput: new KeyboardPlayerMovementInput(Input.Keyboard),
         initialPosition: new Vector2(
-            Graphics!.Width / 2.0f,
-            Graphics.Height / 2.0f),
+            WorldWidth / 2.0f,
+            WorldHeight / 2.0f),
         moveSpeed: 180.0f,
         windowWidth: Graphics.Width,
         windowHeight: Graphics.Height,
         spriteWidth: 80.0f,
-        spriteHeight: 112.0f);
+        spriteHeight: 112.0f,
+        worldWidth: WorldWidth,
+        worldHeight: WorldHeight);
     
     _camera!.Follow(_playerController.Position);
     
     _environmentManager.GenerateRandomized(
         playerPosition: _playerController.Position,
-        windowWidth: Graphics!.Width,
-        windowHeight: Graphics.Height,
+        windowWidth: WorldWidth,
+        windowHeight: WorldHeight,
         seed: 42);
 
     _environmentManager.SynchronizeCollisionBounds(_playerController);
@@ -628,12 +632,8 @@ public override void Update(float deltaTime)
 {
     
     
-    if (_playerController is not null && Graphics is not null)
+    if (_playerController is not null)
     {
-        _playerController.ResizeWindow(
-            Graphics.Width,
-            Graphics.Height);
-
         _playerController.Update(deltaTime);
     }
     
@@ -644,7 +644,10 @@ public override void Update(float deltaTime)
         _camera.Width = Graphics.Width;
         _camera.Height = Graphics.Height;
 
-        _camera.Follow(_playerController.Position);
+        _camera.FollowWithinBounds(
+            _playerController.Position,
+            WorldWidth,
+            WorldHeight);
     }
 
     _testAnimation = _playerController?.CurrentAnimation;
@@ -829,15 +832,6 @@ public override void OnWindowEvent(WindowEvent windowEvent)
     Console.WriteLine(
         $"Window Event: {windowEvent.Type} " +
         $"({windowEvent.Width}x{windowEvent.Height})");
-
-    if (_playerController is not null &&
-        windowEvent.Width > 0 &&
-        windowEvent.Height > 0)
-    {
-        _playerController.ResizeWindow(
-            windowEvent.Width,
-            windowEvent.Height);
-    }
 }
 
 

@@ -8,8 +8,8 @@ internal sealed class PlayerController
     private readonly SpriteAnimationController _animations;
     private readonly IPlayerMovementInput _movementInput;
 
-    private float _windowWidth;
-    private float _windowHeight;
+    private float _worldWidth;
+    private float _worldHeight;
     private readonly float _spriteWidth;
     private readonly float _spriteHeight;
 
@@ -51,7 +51,9 @@ internal sealed class PlayerController
         float windowWidth,
         float windowHeight,
         float spriteWidth,
-        float spriteHeight)
+        float spriteHeight,
+        float? worldWidth = null,
+        float? worldHeight = null)
     {
         ArgumentNullException.ThrowIfNull(animations);
         ArgumentNullException.ThrowIfNull(movementInput);
@@ -87,20 +89,33 @@ internal sealed class PlayerController
         {
             throw new ArgumentOutOfRangeException(nameof(initialPosition));
         }
+        
+        float effectiveWorldWidth = worldWidth ?? windowWidth;
+        float effectiveWorldHeight = worldHeight ?? windowHeight;
+
+        if (!float.IsFinite(effectiveWorldWidth) ||
+            !float.IsFinite(effectiveWorldHeight) ||
+            effectiveWorldWidth < spriteWidth ||
+            effectiveWorldHeight < spriteHeight)
+        {
+            throw new ArgumentOutOfRangeException(
+                nameof(worldWidth),
+                "World dimensions must be finite and large enough for the player.");
+        }
 
         _animations = animations;
         _movementInput = movementInput;
         _moveSpeed = moveSpeed;
 
-        _windowWidth = windowWidth;
-        _windowHeight = windowHeight;
+        _worldWidth = effectiveWorldWidth;
+        _worldHeight = effectiveWorldHeight;
         _spriteWidth = spriteWidth;
         _spriteHeight = spriteHeight;
 
         Position = initialPosition;
         IsFacingLeft = false;
 
-        ClampToWindow();
+        ClampToWorld();
     }
 
     /// <summary>
@@ -175,7 +190,7 @@ internal sealed class PlayerController
             }
         }
 
-        ClampToWindow();
+        ClampToWorld();
 
         if (moving != _isMoving)
         {
@@ -284,37 +299,55 @@ internal sealed class PlayerController
         Position = new Vector2(Position.X, targetY);
     }
     
-    public void ResizeWindow(float width, float height)
+    public void SetWorldBounds(float width, float height)
     {
         if (!float.IsFinite(width) ||
             !float.IsFinite(height) ||
             width <= 0.0f ||
             height <= 0.0f)
         {
-            return;
+            throw new ArgumentOutOfRangeException(
+                nameof(width),
+                "World dimensions must be finite and positive.");
         }
 
         if (width < _spriteWidth || height < _spriteHeight)
         {
+            throw new ArgumentException(
+                "The world must be large enough to contain the player.");
+        }
+
+        _worldWidth = width;
+        _worldHeight = height;
+
+        ClampToWorld();
+    }
+
+// Retained for compatibility with existing callers and tests.
+    public void ResizeWindow(float width, float height)
+    {
+        if (!float.IsFinite(width) ||
+            !float.IsFinite(height) ||
+            width <= 0.0f ||
+            height <= 0.0f ||
+            width < _spriteWidth ||
+            height < _spriteHeight)
+        {
             return;
         }
 
-        _windowWidth = width;
-        _windowHeight = height;
-
-        ClampToWindow();
+        SetWorldBounds(width, height);
     }
-
     
-    private void ClampToWindow()
+    private void ClampToWorld()
     {
         float halfWidth = _spriteWidth / 2.0f;
         float halfHeight = _spriteHeight / 2.0f;
 
         float minX = halfWidth;
-        float maxX = _windowWidth - halfWidth;
+        float maxX = _worldWidth - halfWidth;
         float minY = halfHeight;
-        float maxY = _windowHeight - halfHeight;
+        float maxY = _worldHeight - halfHeight;
 
         Position = new Vector2(
             Math.Clamp(Position.X, minX, maxX),
