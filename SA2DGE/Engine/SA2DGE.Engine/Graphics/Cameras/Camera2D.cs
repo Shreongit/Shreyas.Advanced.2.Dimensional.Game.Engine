@@ -7,6 +7,11 @@ public sealed class Camera2D : Camera
     private float _width;
     private float _height;
     private float _zoom = 1.0f;
+    private float _targetZoom = 1.0f;
+    public const float ZoomTransitionSpeed = 6.0f;
+    public const float MinimumZoom = 0.5f;
+    public const float MaximumZoom = 2.0f;
+    public const float DefaultZoom = 1.0f;
     private float _rotation;
 
     public float Width
@@ -44,8 +49,73 @@ public sealed class Camera2D : Camera
                 throw new ArgumentOutOfRangeException(nameof(value));
 
             _zoom = value;
+            _targetZoom = value;
+
             Update();
         }
+    }
+    
+    
+    /// <summary>
+    /// Changes camera zoom while respecting configured limits.
+    /// </summary>
+    /// <summary>
+    /// Adjusts the target zoom while respecting zoom limits.
+    /// </summary>
+    
+    public void AdjustZoom(float amount)
+    {
+        if (!float.IsFinite(amount))
+            throw new ArgumentOutOfRangeException(nameof(amount));
+
+        _targetZoom = System.Math.Clamp(
+            _targetZoom + amount,
+            MinimumZoom,
+            MaximumZoom);
+    }
+
+    /// <summary>
+    /// Resets camera zoom to its default value.
+    /// </summary>
+    /// <summary>
+    /// Smoothly resets the target zoom to its default value.
+    /// </summary>
+    public void ResetZoom()
+    {
+        _targetZoom = DefaultZoom;
+    }
+    
+    
+    /// <summary>
+    /// Smoothly interpolates current zoom toward target zoom.
+    /// </summary>
+    public void UpdateZoom(
+        float deltaTime,
+        float transitionSpeed = ZoomTransitionSpeed)
+    {
+        if (!float.IsFinite(deltaTime) || deltaTime < 0.0f)
+            throw new ArgumentOutOfRangeException(nameof(deltaTime));
+
+        if (!float.IsFinite(transitionSpeed) || transitionSpeed <= 0.0f)
+            throw new ArgumentOutOfRangeException(nameof(transitionSpeed));
+
+        float interpolation =
+            1.0f - MathF.Exp(-transitionSpeed * deltaTime);
+
+        float difference = _targetZoom - _zoom;
+
+        // Snap to the target when the remaining difference is tiny.
+        if (MathF.Abs(difference) < 0.001f)
+        {
+            _zoom = _targetZoom;
+        }
+        else
+        {
+            _zoom += difference * interpolation;
+        }
+
+        // Recalculate the camera projection matrix.
+        Update();
     }
 
     public float Rotation
@@ -287,5 +357,117 @@ public sealed class Camera2D : Camera
             cameraX,
             cameraY,
             Target.Z);
+        
     }
+    
+        
+    /// <summary>
+    /// Smoothly follows a target while respecting world boundaries.
+    /// </summary>
+    public void FollowSmoothWithinBounds(
+        Vector2 targetPosition,
+        float worldWidth,
+        float worldHeight,
+        float deltaTime,
+        float followSpeed)
+    {
+        if (!float.IsFinite(targetPosition.X) ||
+            !float.IsFinite(targetPosition.Y))
+        {
+            throw new ArgumentOutOfRangeException(
+                nameof(targetPosition));
+        }
+
+        if (!float.IsFinite(worldWidth) ||
+            !float.IsFinite(worldHeight) ||
+            worldWidth <= 0.0f ||
+            worldHeight <= 0.0f)
+        {
+            throw new ArgumentOutOfRangeException(
+                nameof(worldWidth));
+        }
+
+        if (!float.IsFinite(deltaTime) || deltaTime < 0.0f)
+        {
+            throw new ArgumentOutOfRangeException(
+                nameof(deltaTime));
+        }
+
+        if (!float.IsFinite(followSpeed) || followSpeed <= 0.0f)
+        {
+            throw new ArgumentOutOfRangeException(
+                nameof(followSpeed));
+        }
+
+        // Calculate the desired camera position using FollowOffset.
+        float cos = MathF.Cos(Rotation);
+        float sin = MathF.Sin(Rotation);
+
+        float offsetX =
+            (FollowOffset.X * cos - FollowOffset.Y * sin) / Zoom;
+
+        float offsetY =
+            (FollowOffset.X * sin + FollowOffset.Y * cos) / Zoom;
+
+        float desiredX = targetPosition.X - offsetX;
+        float desiredY = targetPosition.Y - offsetY;
+
+        // Calculate visible world-space camera extents.
+        float halfWidth = Width / (2.0f * Zoom);
+        float halfHeight = Height / (2.0f * Zoom);
+
+        float absCos = MathF.Abs(cos);
+        float absSin = MathF.Abs(sin);
+
+        float extentX =
+            absCos * halfWidth + absSin * halfHeight;
+
+        float extentY =
+            absSin * halfWidth + absCos * halfHeight;
+
+        float minX = extentX;
+        float maxX = worldWidth - extentX;
+
+        float minY = extentY;
+        float maxY = worldHeight - extentY;
+
+        // Clamp the desired position to the world.
+        desiredX = minX > maxX
+            ? worldWidth * 0.5f
+            : System.Math.Clamp(desiredX, minX, maxX);
+
+        desiredY = minY > maxY
+            ? worldHeight * 0.5f
+            : System.Math.Clamp(desiredY, minY, maxY);
+
+        // Keep the current camera position inside valid bounds.
+        float currentX = minX > maxX
+            ? worldWidth * 0.5f
+            : System.Math.Clamp(Position.X, minX, maxX);
+
+        float currentY = minY > maxY
+            ? worldHeight * 0.5f
+            : System.Math.Clamp(Position.Y, minY, maxY);
+
+        // Frame-rate-independent exponential smoothing.
+        float interpolation =
+            1.0f - MathF.Exp(-followSpeed * deltaTime);
+
+        float newX =
+            currentX + (desiredX - currentX) * interpolation;
+
+        float newY =
+            currentY + (desiredY - currentY) * interpolation;
+
+        Position = new Vector3(
+            newX,
+            newY,
+            Position.Z);
+
+        Target = new Vector3(
+            newX,
+            newY,
+            Target.Z);
+    }
+    
 }

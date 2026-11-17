@@ -38,6 +38,10 @@ public sealed class GameLoop
         {
             while (_running && _game.Window.IsOpen)
             {
+                // Begin the frame BEFORE processing events.
+// This prevents newly received input from being cleared.
+                _game.Input.BeginFrame();
+
                 _game.Window.ProcessEvents();
 
                 while (_game.Window.TryGetEvent(out WindowEvent windowEvent))
@@ -48,7 +52,6 @@ public sealed class GameLoop
                 if (!_game.Window.IsOpen)
                     break;
 
-                _game.Input.BeginFrame();
                 _game.UpdateInput();
 
                 double frameDelta = _clock.Elapsed.TotalSeconds;

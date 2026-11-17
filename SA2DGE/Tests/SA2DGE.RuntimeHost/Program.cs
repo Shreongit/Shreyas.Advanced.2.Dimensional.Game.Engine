@@ -71,6 +71,9 @@ internal sealed class RuntimeGame : Game
     private const float MaximumMoveSpeed = 600.0f;
     private const float WorldWidth = 3840.0f;
     private const float WorldHeight = 2160.0f;
+    private const float CameraFollowSpeed = 8.0f;
+    private const float CameraZoomStep = 0.1f;
+    private const float CameraZoomTransitionSpeed = 6.0f;
     private readonly EnvironmentManager _environmentManager = new();
     
 
@@ -632,6 +635,36 @@ public override void Update(float deltaTime)
 {
     
     
+    // Stage 6.7.3: Camera zoom controls.
+    if (_camera is not null)
+    {
+        float wheelDelta = Input.Mouse.WheelDelta;
+
+        if (wheelDelta != 0.0f)
+        {
+            _camera.AdjustZoom(
+                wheelDelta > 0.0f
+                    ? CameraZoomStep
+                    : -CameraZoomStep);
+
+            Console.WriteLine(
+                $"Camera Zoom: {_camera.Zoom:F2}x");
+        }
+
+        if (Input.Keyboard.IsPressed(InputKey.Number0))
+        {
+            _camera.ResetZoom();
+
+            Console.WriteLine("Camera Zoom: 1.00x");
+        }
+        
+        // Stage 6.7.4: Smooth zoom transition.
+        _camera.UpdateZoom(
+            deltaTime,
+            CameraZoomTransitionSpeed);
+    }
+    
+    
     if (_playerController is not null)
     {
         _playerController.Update(deltaTime);
@@ -644,10 +677,12 @@ public override void Update(float deltaTime)
         _camera.Width = Graphics.Width;
         _camera.Height = Graphics.Height;
 
-        _camera.FollowWithinBounds(
+        _camera.FollowSmoothWithinBounds(
             _playerController.Position,
             WorldWidth,
-            WorldHeight);
+            WorldHeight,
+            deltaTime,
+            CameraFollowSpeed);
     }
 
     _testAnimation = _playerController?.CurrentAnimation;
@@ -796,11 +831,7 @@ public override void Update(float deltaTime)
         Engine.Stop();
     }
 
-    if (Input.Mouse.WheelDelta != 0.0f)
-    {
-        Console.WriteLine(
-            $"Mouse Wheel: {Input.Mouse.WheelDelta}");
-    }
+    
 
     if (Gamepad.IsConnected)
     {
