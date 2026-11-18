@@ -13,7 +13,8 @@ public sealed class Camera2D : Camera
     public const float MaximumZoom = 2.0f;
     public const float DefaultZoom = 1.0f;
     private float _rotation;
-
+    private Vector2 _followOffset = Vector2.Zero;
+    
     public float Width
     {
         get => _width;
@@ -131,8 +132,28 @@ public sealed class Camera2D : Camera
         }
     }
     
-    public Vector2 FollowOffset { get; set; } = Vector2.Zero;
+    
+    /// <summary>
+    /// Gets or sets the camera's screen-space offset
+    /// from its followed target.
+    /// </summary>
+    public Vector2 FollowOffset
+    {
+        get => _followOffset;
+        set
+        {
+            if (!float.IsFinite(value.X) ||
+                !float.IsFinite(value.Y))
+            {
+                throw new ArgumentOutOfRangeException(
+                    nameof(value),
+                    "Follow offset coordinates must be finite.");
+            }
 
+            _followOffset = value;
+        }
+    }
+    
     public bool PixelPerfect { get; set; }
 
     public Camera2D(float width, float height)

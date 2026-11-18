@@ -667,5 +667,39 @@ public sealed class Camera2DTests
             Tolerance);
     }
     
+    
+    [Fact]
+    public void FollowOffset_AcceptsValidValues()
+    {
+        var camera = new Camera2D(1280.0f, 720.0f);
+
+        Vector2 offset = new(100.0f, -50.0f);
+
+        camera.FollowOffset = offset;
+
+        Assert.Equal(offset.X, camera.FollowOffset.X);
+        Assert.Equal(offset.Y, camera.FollowOffset.Y);
+    }
+
+    [Fact]
+    public void FollowOffset_NaNValue_Throws()
+    {
+        var camera = new Camera2D(1280.0f, 720.0f);
+
+        Assert.Throws<ArgumentOutOfRangeException>(
+            () => camera.FollowOffset =
+                new Vector2(float.NaN, 0.0f));
+    }
+
+    [Fact]
+    public void FollowOffset_InfiniteValue_Throws()
+    {
+        var camera = new Camera2D(1280.0f, 720.0f);
+
+        Assert.Throws<ArgumentOutOfRangeException>(
+            () => camera.FollowOffset =
+                new Vector2(0.0f, float.PositiveInfinity));
+    }
+    
 
 }
