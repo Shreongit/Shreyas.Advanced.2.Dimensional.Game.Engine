@@ -2,6 +2,9 @@ C:\Users\patha\Documents\Game Development\Shreyas's Advanced 2-Dimensional Game 
 C:\Users\patha\Documents\Game Development\Shreyas's Advanced 2-Dimensional Game Engine\SA2DGE\Tests\SA2DGE.RuntimeHost.Tests\bin\Debug\net10.0\CoverletSourceRootsMapping_SA2DGE.RuntimeHost.Tests
 C:\Users\patha\Documents\Game Development\Shreyas's Advanced 2-Dimensional Game Engine\SA2DGE\Tests\SA2DGE.RuntimeHost.Tests\bin\Debug\net10.0\testhost.dll
 C:\Users\patha\Documents\Game Development\Shreyas's Advanced 2-Dimensional Game Engine\SA2DGE\Tests\SA2DGE.RuntimeHost.Tests\bin\Debug\net10.0\xunit.abstractions.dll
+C:\Users\patha\Documents\Game Development\Shreyas's Advanced 2-Dimensional Game Engine\SA2DGE\Tests\SA2DGE.RuntimeHost.Tests\bin\Debug\net10.0\SA2DGE.RuntimeHost.deps.json
+C:\Users\patha\Documents\Game Development\Shreyas's Advanced 2-Dimensional Game Engine\SA2DGE\Tests\SA2DGE.RuntimeHost.Tests\bin\Debug\net10.0\SA2DGE.RuntimeHost.runtimeconfig.json
+C:\Users\patha\Documents\Game Development\Shreyas's Advanced 2-Dimensional Game Engine\SA2DGE\Tests\SA2DGE.RuntimeHost.Tests\bin\Debug\net10.0\SA2DGE.RuntimeHost.exe
 C:\Users\patha\Documents\Game Development\Shreyas's Advanced 2-Dimensional Game Engine\SA2DGE\Tests\SA2DGE.RuntimeHost.Tests\bin\Debug\net10.0\testhost.exe
 C:\Users\patha\Documents\Game Development\Shreyas's Advanced 2-Dimensional Game Engine\SA2DGE\Tests\SA2DGE.RuntimeHost.Tests\bin\Debug\net10.0\xunit.runner.visualstudio.testadapter.dll
 C:\Users\patha\Documents\Game Development\Shreyas's Advanced 2-Dimensional Game Engine\SA2DGE\Tests\SA2DGE.RuntimeHost.Tests\bin\Debug\net10.0\SA2DGE.RuntimeHost.Tests.deps.json
@@ -19,6 +22,7 @@ C:\Users\patha\Documents\Game Development\Shreyas's Advanced 2-Dimensional Game 
 C:\Users\patha\Documents\Game Development\Shreyas's Advanced 2-Dimensional Game Engine\SA2DGE\Tests\SA2DGE.RuntimeHost.Tests\bin\Debug\net10.0\Newtonsoft.Json.dll
 C:\Users\patha\Documents\Game Development\Shreyas's Advanced 2-Dimensional Game Engine\SA2DGE\Tests\SA2DGE.RuntimeHost.Tests\bin\Debug\net10.0\SharpGen.Runtime.dll
 C:\Users\patha\Documents\Game Development\Shreyas's Advanced 2-Dimensional Game Engine\SA2DGE\Tests\SA2DGE.RuntimeHost.Tests\bin\Debug\net10.0\SharpGen.Runtime.COM.dll
+C:\Users\patha\Documents\Game Development\Shreyas's Advanced 2-Dimensional Game Engine\SA2DGE\Tests\SA2DGE.RuntimeHost.Tests\bin\Debug\net10.0\StbImageSharp.dll
 C:\Users\patha\Documents\Game Development\Shreyas's Advanced 2-Dimensional Game Engine\SA2DGE\Tests\SA2DGE.RuntimeHost.Tests\bin\Debug\net10.0\Vortice.D3DCompiler.dll
 C:\Users\patha\Documents\Game Development\Shreyas's Advanced 2-Dimensional Game Engine\SA2DGE\Tests\SA2DGE.RuntimeHost.Tests\bin\Debug\net10.0\Vortice.Direct3D11.dll
 C:\Users\patha\Documents\Game Development\Shreyas's Advanced 2-Dimensional Game Engine\SA2DGE\Tests\SA2DGE.RuntimeHost.Tests\bin\Debug\net10.0\Vortice.DirectX.dll
@@ -93,7 +97,9 @@ C:\Users\patha\Documents\Game Development\Shreyas's Advanced 2-Dimensional Game 
 C:\Users\patha\Documents\Game Development\Shreyas's Advanced 2-Dimensional Game Engine\SA2DGE\Tests\SA2DGE.RuntimeHost.Tests\bin\Debug\net10.0\zh-Hant\Microsoft.TestPlatform.CrossPlatEngine.resources.dll
 C:\Users\patha\Documents\Game Development\Shreyas's Advanced 2-Dimensional Game Engine\SA2DGE\Tests\SA2DGE.RuntimeHost.Tests\bin\Debug\net10.0\zh-Hant\Microsoft.VisualStudio.TestPlatform.Common.resources.dll
 C:\Users\patha\Documents\Game Development\Shreyas's Advanced 2-Dimensional Game Engine\SA2DGE\Tests\SA2DGE.RuntimeHost.Tests\bin\Debug\net10.0\SA2DGE.Engine.dll
+C:\Users\patha\Documents\Game Development\Shreyas's Advanced 2-Dimensional Game Engine\SA2DGE\Tests\SA2DGE.RuntimeHost.Tests\bin\Debug\net10.0\SA2DGE.RuntimeHost.dll
 C:\Users\patha\Documents\Game Development\Shreyas's Advanced 2-Dimensional Game Engine\SA2DGE\Tests\SA2DGE.RuntimeHost.Tests\bin\Debug\net10.0\SA2DGE.Engine.pdb
+C:\Users\patha\Documents\Game Development\Shreyas's Advanced 2-Dimensional Game Engine\SA2DGE\Tests\SA2DGE.RuntimeHost.Tests\bin\Debug\net10.0\SA2DGE.RuntimeHost.pdb
 C:\Users\patha\Documents\Game Development\Shreyas's Advanced 2-Dimensional Game Engine\SA2DGE\Tests\SA2DGE.RuntimeHost.Tests\obj\Debug\net10.0\SA2DGE.RuntimeHost.Tests.csproj.AssemblyReference.cache
 C:\Users\patha\Documents\Game Development\Shreyas's Advanced 2-Dimensional Game Engine\SA2DGE\Tests\SA2DGE.RuntimeHost.Tests\obj\Debug\net10.0\SA2DGE.RuntimeHost.Tests.GeneratedMSBuildEditorConfig.editorconfig
 C:\Users\patha\Documents\Game Development\Shreyas's Advanced 2-Dimensional Game Engine\SA2DGE\Tests\SA2DGE.RuntimeHost.Tests\obj\Debug\net10.0\SA2DGE.RuntimeHost.Tests.AssemblyInfoInputs.cache
@@ -105,9 +111,3 @@ C:\Users\patha\Documents\Game Development\Shreyas's Advanced 2-Dimensional Game 
 C:\Users\patha\Documents\Game Development\Shreyas's Advanced 2-Dimensional Game Engine\SA2DGE\Tests\SA2DGE.RuntimeHost.Tests\obj\Debug\net10.0\SA2DGE.RuntimeHost.Tests.pdb
 C:\Users\patha\Documents\Game Development\Shreyas's Advanced 2-Dimensional Game Engine\SA2DGE\Tests\SA2DGE.RuntimeHost.Tests\obj\Debug\net10.0\SA2DGE.RuntimeHost.Tests.genruntimeconfig.cache
 C:\Users\patha\Documents\Game Development\Shreyas's Advanced 2-Dimensional Game Engine\SA2DGE\Tests\SA2DGE.RuntimeHost.Tests\obj\Debug\net10.0\ref\SA2DGE.RuntimeHost.Tests.dll
-C:\Users\patha\Documents\Game Development\Shreyas's Advanced 2-Dimensional Game Engine\SA2DGE\Tests\SA2DGE.RuntimeHost.Tests\bin\Debug\net10.0\SA2DGE.RuntimeHost.deps.json
-C:\Users\patha\Documents\Game Development\Shreyas's Advanced 2-Dimensional Game Engine\SA2DGE\Tests\SA2DGE.RuntimeHost.Tests\bin\Debug\net10.0\SA2DGE.RuntimeHost.runtimeconfig.json
-C:\Users\patha\Documents\Game Development\Shreyas's Advanced 2-Dimensional Game Engine\SA2DGE\Tests\SA2DGE.RuntimeHost.Tests\bin\Debug\net10.0\SA2DGE.RuntimeHost.exe
-C:\Users\patha\Documents\Game Development\Shreyas's Advanced 2-Dimensional Game Engine\SA2DGE\Tests\SA2DGE.RuntimeHost.Tests\bin\Debug\net10.0\StbImageSharp.dll
-C:\Users\patha\Documents\Game Development\Shreyas's Advanced 2-Dimensional Game Engine\SA2DGE\Tests\SA2DGE.RuntimeHost.Tests\bin\Debug\net10.0\SA2DGE.RuntimeHost.dll
-C:\Users\patha\Documents\Game Development\Shreyas's Advanced 2-Dimensional Game Engine\SA2DGE\Tests\SA2DGE.RuntimeHost.Tests\bin\Debug\net10.0\SA2DGE.RuntimeHost.pdb

@@ -701,5 +701,249 @@ public sealed class Camera2DTests
                 new Vector2(0.0f, float.PositiveInfinity));
     }
     
+    
+    [Fact]
+    public void SetFollowTarget_StoresTargetPosition()
+    {
+        var camera = new Camera2D(1280.0f, 720.0f);
+        Vector2 target = new(500.0f, 300.0f);
+
+        camera.SetFollowTarget(target);
+
+        Assert.True(camera.HasFollowTarget);
+        Assert.Equal(target, camera.FollowTarget);
+    }
+
+    [Fact]
+    public void ClearFollowTarget_RemovesTarget()
+    {
+        var camera = new Camera2D(1280.0f, 720.0f);
+
+        camera.SetFollowTarget(new Vector2(500.0f, 300.0f));
+        camera.ClearFollowTarget();
+
+        Assert.False(camera.HasFollowTarget);
+        Assert.Null(camera.FollowTarget);
+    }
+
+    [Fact]
+    public void FollowCurrentTarget_WithoutTarget_DoesNotMoveCamera()
+    {
+        var camera = new Camera2D(1280.0f, 720.0f);
+        Vector3 initialPosition = camera.Position;
+
+        camera.FollowCurrentTarget(
+            3840.0f,
+            2160.0f,
+            1.0f / 60.0f,
+            8.0f);
+
+        Assert.Equal(initialPosition, camera.Position);
+    }
+
+    [Fact]
+    public void SetFollowTarget_InvalidPosition_Throws()
+    {
+        var camera = new Camera2D(1280.0f, 720.0f);
+
+        Assert.Throws<ArgumentOutOfRangeException>(
+            () => camera.SetFollowTarget(
+                new Vector2(float.NaN, 100.0f)));
+    }
+    
+    [Fact]
+    public void Zoom_AboveMaximum_Throws()
+    {
+        var camera = new Camera2D(1280.0f, 720.0f);
+
+        Assert.Throws<ArgumentOutOfRangeException>(
+            () => camera.Zoom = 5.0f);
+    }
+
+    
+    [Fact]
+    public void Zoom_BelowMinimum_Throws()
+    {
+        var camera = new Camera2D(1280.0f, 720.0f);
+
+        Assert.Throws<ArgumentOutOfRangeException>(
+            () => camera.Zoom = 0.1f);
+    }
+
+    [Fact]
+    public void Zoom_NaN_Throws()
+    {
+        var camera = new Camera2D(1280.0f, 720.0f);
+
+        Assert.Throws<ArgumentOutOfRangeException>(
+            () => camera.Zoom = float.NaN);
+    }
+
+    [Fact]
+    public void Zoom_PositiveInfinity_Throws()
+    {
+        var camera = new Camera2D(1280.0f, 720.0f);
+
+        Assert.Throws<ArgumentOutOfRangeException>(
+            () => camera.Zoom = float.PositiveInfinity);
+    }
+
+    [Fact]
+    public void ResetZoom_SetsTargetToDefault()
+    {
+        var camera = new Camera2D(1280.0f, 720.0f);
+
+        camera.AdjustZoom(0.5f);
+        camera.ResetZoom();
+
+        camera.UpdateZoom(1.0f);
+
+        Assert.Equal(Camera2D.DefaultZoom, camera.Zoom);
+    }
+    
+    [Fact]
+    public void FollowWithinBounds_SmallWorld_CentersCamera()
+    {
+        var camera = new Camera2D(1280.0f, 720.0f);
+
+        camera.FollowWithinBounds(
+            new Vector2(0.0f, 0.0f),
+            500.0f,
+            300.0f);
+
+        Assert.Equal(250.0f, camera.Position.X);
+        Assert.Equal(150.0f, camera.Position.Y);
+    }
+    
+    [Fact]
+    public void FollowWithinBounds_ClampsAllFourWorldBoundaries()
+    {
+        const float worldWidth = 3840.0f;
+        const float worldHeight = 2160.0f;
+
+        // Left boundary
+        var camera = new Camera2D(1280.0f, 720.0f);
+        camera.FollowWithinBounds(
+            new Vector2(0.0f, 1080.0f),
+            worldWidth,
+            worldHeight);
+
+        Assert.Equal(640.0f, camera.Position.X);
+
+        // Right boundary
+        camera = new Camera2D(1280.0f, 720.0f);
+        camera.FollowWithinBounds(
+            new Vector2(worldWidth, 1080.0f),
+            worldWidth,
+            worldHeight);
+
+        Assert.Equal(3200.0f, camera.Position.X);
+
+        // Top boundary
+        camera = new Camera2D(1280.0f, 720.0f);
+        camera.FollowWithinBounds(
+            new Vector2(1920.0f, 0.0f),
+            worldWidth,
+            worldHeight);
+
+        Assert.Equal(360.0f, camera.Position.Y);
+
+        // Bottom boundary
+        camera = new Camera2D(1280.0f, 720.0f);
+        camera.FollowWithinBounds(
+            new Vector2(1920.0f, worldHeight),
+            worldWidth,
+            worldHeight);
+
+        Assert.Equal(1800.0f, camera.Position.Y);
+    }
+    
+    [Fact]
+    public void FollowWithinBounds_Rotation_RespectsWorldBoundaries()
+    {
+        var camera = new Camera2D(1280.0f, 720.0f)
+        {
+            Rotation = MathF.PI / 2.0f
+        };
+
+        camera.FollowWithinBounds(
+            new Vector2(0.0f, 1080.0f),
+            3840.0f,
+            2160.0f);
+
+        Assert.InRange(
+            MathF.Abs(camera.Position.X - 360.0f),
+            0.0f,
+            Tolerance);
+    }
+    
+    [Fact]
+    public void FollowWithinBounds_Zoom_UpdatesVisibleWorldExtents()
+    {
+        var camera = new Camera2D(1280.0f, 720.0f)
+        {
+            Zoom = 2.0f
+        };
+
+        camera.FollowWithinBounds(
+            Vector2.Zero,
+            3840.0f,
+            2160.0f);
+
+        Assert.Equal(320.0f, camera.Position.X);
+        Assert.Equal(180.0f, camera.Position.Y);
+    }
+    
+    [Fact]
+    public void FollowWithinBounds_InvalidWorldDimensions_Throws()
+    {
+        var camera = new Camera2D(1280.0f, 720.0f);
+
+        Assert.Throws<ArgumentOutOfRangeException>(
+            () => camera.FollowWithinBounds(
+                Vector2.Zero,
+                0.0f,
+                2160.0f));
+
+        Assert.Throws<ArgumentOutOfRangeException>(
+            () => camera.FollowWithinBounds(
+                Vector2.Zero,
+                3840.0f,
+                float.NaN));
+    }
+      
+    
+    [Fact]
+    public void FollowSmoothWithinBounds_InvalidDeltaTime_Throws()
+    {
+        var camera = new Camera2D(1280.0f, 720.0f);
+
+        Assert.Throws<ArgumentOutOfRangeException>(
+            () => camera.FollowSmoothWithinBounds(
+                new Vector2(500.0f, 300.0f),
+                3840.0f,
+                2160.0f,
+                -1.0f,
+                8.0f));
+    }
+    
+    [Fact]
+    public void FollowSmoothWithinBounds_InvalidFollowSpeed_Throws()
+    {
+        var camera = new Camera2D(1280.0f, 720.0f);
+
+        Assert.Throws<ArgumentOutOfRangeException>(
+            () => camera.FollowSmoothWithinBounds(
+                new Vector2(500.0f, 300.0f),
+                3840.0f,
+                2160.0f,
+                1.0f / 60.0f,
+                0.0f));
+    }
+    
+    
 
 }
+
+
+

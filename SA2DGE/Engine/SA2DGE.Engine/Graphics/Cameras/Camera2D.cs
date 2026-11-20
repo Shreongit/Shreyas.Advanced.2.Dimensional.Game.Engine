@@ -14,6 +14,8 @@ public sealed class Camera2D : Camera
     public const float DefaultZoom = 1.0f;
     private float _rotation;
     private Vector2 _followOffset = Vector2.Zero;
+    private Vector2? _followTarget;
+    private bool _hasFollowTarget;
     
     public float Width
     {
@@ -40,17 +42,48 @@ public sealed class Camera2D : Camera
             Update();
         }
     }
+    
+    
+    
+    private static float ValidateZoom(float value)
+    {
+        if (!float.IsFinite(value) ||
+            value < MinimumZoom ||
+            value > MaximumZoom)
+        {
+            throw new ArgumentOutOfRangeException(
+                nameof(value),
+                $"Zoom must be between {MinimumZoom} and {MaximumZoom}.");
+        }
 
+        return value;
+    }
+
+    private static float ClampZoom(float value)
+    {
+        if (!float.IsFinite(value))
+        {
+            throw new ArgumentOutOfRangeException(
+                nameof(value),
+                "Zoom must be finite.");
+        }
+
+        return System.Math.Clamp(
+            value,
+            MinimumZoom,
+            MaximumZoom);
+    }
+
+    
     public float Zoom
     {
         get => _zoom;
         set
         {
-            if (!float.IsFinite(value) || value <= 0.0f)
-                throw new ArgumentOutOfRangeException(nameof(value));
+            float validatedZoom = ValidateZoom(value);
 
-            _zoom = value;
-            _targetZoom = value;
+            _zoom = validatedZoom;
+            _targetZoom = validatedZoom;
 
             Update();
         }
@@ -67,12 +100,13 @@ public sealed class Camera2D : Camera
     public void AdjustZoom(float amount)
     {
         if (!float.IsFinite(amount))
-            throw new ArgumentOutOfRangeException(nameof(amount));
+        {
+            throw new ArgumentOutOfRangeException(
+                nameof(amount),
+                "Zoom adjustment must be finite.");
+        }
 
-        _targetZoom = System.Math.Clamp(
-            _targetZoom + amount,
-            MinimumZoom,
-            MaximumZoom);
+        _targetZoom = ClampZoom(_targetZoom + amount);
     }
 
     /// <summary>
@@ -274,6 +308,52 @@ public sealed class Camera2D : Camera
 
         SetViewMatrixFromUp(rotatedUp);
     }
+    
+    
+    
+    /// <summary>
+    /// Sets the world-space position that the camera should follow.
+    /// </summary>
+    public void SetFollowTarget(Vector2 targetPosition)
+    {
+        if (!float.IsFinite(targetPosition.X) ||
+            !float.IsFinite(targetPosition.Y))
+        {
+            throw new ArgumentOutOfRangeException(
+                nameof(targetPosition),
+                "Follow target coordinates must be finite.");
+        }
+
+        _followTarget = targetPosition;
+        _hasFollowTarget = true;
+    }
+
+    /// <summary>
+    /// Updates the current follow target position.
+    /// </summary>
+    public void UpdateFollowTarget(Vector2 targetPosition)
+    {
+        SetFollowTarget(targetPosition);
+    }
+
+    /// <summary>
+    /// Stops following the current target.
+    /// </summary>
+    public void ClearFollowTarget()
+    {
+        _followTarget = null;
+        _hasFollowTarget = false;
+    }
+
+    /// <summary>
+    /// Gets whether the camera currently has a follow target.
+    /// </summary>
+    public bool HasFollowTarget => _hasFollowTarget;
+
+    /// <summary>
+    /// Gets the current follow target position, if available.
+    /// </summary>
+    public Vector2? FollowTarget => _followTarget;
     
     /// <summary>
     /// Moves the camera to follow a world-space position
@@ -489,6 +569,28 @@ public sealed class Camera2D : Camera
             newX,
             newY,
             Target.Z);
+    }
+    
+    
+    /// <summary>
+    /// Smoothly follows the currently assigned target.
+    /// Does nothing when no target is assigned.
+    /// </summary>
+    public void FollowCurrentTarget(
+        float worldWidth,
+        float worldHeight,
+        float deltaTime,
+        float followSpeed)
+    {
+        if (!_hasFollowTarget || !_followTarget.HasValue)
+            return;
+
+        FollowSmoothWithinBounds(
+            _followTarget.Value,
+            worldWidth,
+            worldHeight,
+            deltaTime,
+            followSpeed);
     }
     
 }
