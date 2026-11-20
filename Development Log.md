@@ -144,3 +144,75 @@ Successfully integrated sprite animation with the Direct3D 11 rendering pipeline
 
 Implemented and verified player movement using WASD and arrow keys, including normalized diagonal movement. Integrated animation state switching so the player displays Idle while stationary and Walk while moving. Added horizontal sprite flipping based on movement direction and enforced configured screen boundaries. Manual animation frame controls using keys `4` and `5` were verified without conflicting with directional movement.
 
+
+## Stage 5 — Player and Environment Integration
+
+**Objective:** Integrate the player with the game environment and establish the foundation for interactive gameplay.
+
+### Implementation
+
+- Integrated player movement with the existing game loop.
+- Implemented keyboard-based movement using WASD and arrow keys.
+- Added normalized diagonal movement to maintain consistent movement speed.
+- Integrated player animation with movement states.
+- Implemented idle and walking animation transitions.
+- Added horizontal sprite flipping based on movement direction.
+- Established environment objects and their rendering within the game world.
+- Verified player movement and animation behaviour.
+
+## Stage 6 — Camera System and World Integration
+
+**Objective:** Separate the game world from the screen viewport and introduce a camera system capable of following the player.
+
+### 6.1–6.5 — Camera Foundation and Rendering Integration
+
+- Introduced `Camera2D` for world-to-screen coordinate transformation.
+- Integrated camera support into `Renderer2D`.
+- Added screen-space and world-space rendering.
+- Integrated environment object rendering with world coordinates.
+- Connected camera following to player movement.
+
+### 6.6 — Scrolling World and World Boundaries
+
+- Established world dimensions of `3840 × 2160`.
+- Separated world boundaries from window boundaries.
+- Implemented player world-boundary constraints.
+- Added camera boundary constraints.
+- Ensured background rendering remains in screen space.
+
+### 6.7 — Camera Following and Zoom
+
+- Implemented smooth camera following using exponential interpolation.
+- Added configurable camera follow speed.
+- Implemented mouse-wheel zoom controls.
+- Added minimum and maximum zoom limits.
+- Implemented smooth zoom transitions and reset behaviour.
+- Fixed mouse-wheel input lifecycle ordering in `GameLoop.cs`.
+
+### 6.8 — Camera System Polish
+
+- Added camera configuration validation.
+- Implemented explicit camera follow-target management.
+- Added zoom validation and reset behaviour.
+- Strengthened rotation-aware and zoom-aware boundary handling.
+- Added regression tests for camera edge cases.
+- Completed camera integration and runtime verification.
+
+## Final Achievements
+
+### Test Baselines
+
+- **98/98** — Camera-stage test baseline at Stage 6 completion.
+- **114/114** — Updated test baseline after Tileset tests.
+
+### Major Systems Completed
+
+- Player movement and animation.
+- Environment integration.
+- World-space rendering.
+- Camera following and constraints.
+- Smooth zoom system.
+- Tile and Tileset foundation.
+
+
+
