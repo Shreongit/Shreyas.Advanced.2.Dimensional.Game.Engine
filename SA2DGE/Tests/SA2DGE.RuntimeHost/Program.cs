@@ -9,6 +9,7 @@ using SA2DGE.Engine.Graphics.Shaders;
 using SA2DGE.Engine.Graphics;
 using SA2DGE.Engine.Graphics.Cameras;
 using SA2DGE.Engine.Math;
+using SA2DGE.Engine.Graphics.Tiles;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -61,6 +62,9 @@ internal sealed class RuntimeGame : Game
     private Texture2D? _testTexture;
     private SpriteSheet? _testSpriteSheet;
     private Texture2D? _soldierTexture;
+    private Texture2D? _tilesetTexture;
+    private Tileset? _tileset;
+    private Tilemap? _tilemap;
     private BackgroundLayer? _backgroundLayer;
     private SpriteSheet? _soldierSpriteSheet;
     private SpriteAnimation? _testAnimation;
@@ -154,6 +158,87 @@ public override void Initialize()
     
     _renderer = new Direct3D11Renderer2D(Graphics!);
     _renderer.Initialize();
+    
+    
+    // Stage 7.3.4: Initialize tileset.
+
+    string tilesetPath = Path.GetFullPath(
+        Path.Combine(
+            AppContext.BaseDirectory,
+            "..",
+            "..",
+            "..",
+            "..",
+            "..",
+            "Assets",
+            "Tileset",
+            "tileset_arranged.png"));
+
+    _tilesetTexture = LoadPngTexture(tilesetPath);
+
+    _tileset = new Tileset(_tilesetTexture);
+    
+    // Stage 7.3.5: Ground texture regions.
+
+    _tileset.Add(0, 0, 192, 32, 32);
+    _tileset.Add(1, 96, 192, 32, 32);
+
+    Console.WriteLine(
+        $"Ground tiles registered: {_tileset.Count}");
+
+// Register our first test tile.
+// Coordinates are pixel coordinates inside the texture.
+    // Stage 7.3.5: Register terrain tiles.
+
+    
+    
+    // Stage 7.3.5: Register 32x32 terrain regions.
+
+    
+    
+    
+    Console.WriteLine(
+        $"Terrain tiles registered: {_tileset.Count}");
+    
+    Console.WriteLine(
+        $"Terrain tiles registered: {_tileset.Count}");
+
+    Console.WriteLine(
+        $"Stage 7.3.4: Tileset initialized. Tiles: {_tileset.Count}");
+    
+    // Stage 7.3.4: Create the first tilemap.
+
+    _tilemap = new Tilemap(
+        tileset: _tileset,
+        width: 40,
+        height: 23);
+
+// Fill the map with our first registered tile.
+
+// Stage 7.3.5: Generate terrain variations.
+    
+    // Stage 7.3.5: Generate terrain.
+
+    Random random = new Random(42);
+
+    for (int y = 0; y < _tilemap.Height; y++)
+    {
+        for (int x = 0; x < _tilemap.Width; x++)
+        {
+            int tileId = random.Next(100) < 85
+                ? 0
+                : 1;
+
+            _tilemap.SetTile(x, y, tileId);
+        }
+    }
+
+    Console.WriteLine(
+        "Stage 7.3.5: Terrain generated.");
+    
+                
+    Console.WriteLine(
+        $"Tilemap created: {_tilemap.Width}x{_tilemap.Height}");
     
     _camera = new Camera2D(
         Graphics!.Width,
@@ -880,6 +965,24 @@ public override void Render()
         Graphics.Height);
     
     _environmentManager.Draw(_renderer!);
+    
+    
+    // Stage 7.3.4: Render tilemap.
+
+    if (_tilemap is not null)
+    {
+        Vector2 tilemapPosition = new(
+            (WorldWidth - (_tilemap.Width * 32.0f)) / 2.0f,
+            (WorldHeight - (_tilemap.Height * 32.0f)) / 2.0f);
+
+        _renderer!.DrawTilemap(
+            tilemap: _tilemap,
+            position: tilemapPosition,
+            tileSize: new Vector2(32.0f, 32.0f),
+            color: new Color(255, 255, 255, 255),
+            layer: 2,
+            space: CoordinateSpace.World);
+    }
 
     // Layer 3: Magenta top-left UV region of the test texture.
     
@@ -912,6 +1015,13 @@ public override void Shutdown()
     _backgroundLayer?.Dispose();
     _backgroundLayer = null;
     
+    
+    _tilesetTexture?.Dispose();
+    _tilesetTexture = null;
+
+    _tileset = null;
+    _tilemap = null;
+    
     _renderer?.Shutdown();
     _renderer?.Dispose();
     _renderer = null;
@@ -932,6 +1042,8 @@ public override void Shutdown()
 
     _vertexBuffer?.Dispose();
     _vertexBuffer = null;
+    
+    
 
     Console.WriteLine(
         "SA2DGE shutdown.");

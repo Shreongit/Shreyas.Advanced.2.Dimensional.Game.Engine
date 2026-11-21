@@ -2,7 +2,8 @@ using SA2DGE.Engine.Math;
 
 namespace SA2DGE.Engine.Graphics;
 using SA2DGE.Engine.Graphics.Cameras;
-
+using SA2DGE.Engine.Graphics.Textures;
+using SA2DGE.Engine.Graphics.Tiles;
 public abstract class Renderer2D : Renderer
 {
     private readonly RenderQueue _renderQueue = new();
@@ -54,6 +55,74 @@ public abstract class Renderer2D : Renderer
                 space));
                 
     }
+    
+    
+    /// <summary>
+    /// Draws every non-empty tile in a tilemap.
+    /// </summary>
+    /// <param name="tilemap">The tilemap to render.</param>
+    /// <param name="position">World or screen position of the map's top-left corner.</param>
+    /// <param name="tileSize">Rendered size of each tile.</param>
+    /// <param name="color">Tint applied to every tile.</param>
+    /// <param name="layer">Rendering layer.</param>
+    /// <param name="space">Coordinate space used for positioning.</param>
+    public void DrawTilemap(
+        Tilemap tilemap,
+        Vector2 position,
+        Vector2 tileSize,
+        Color color,
+        int layer = 0,
+        CoordinateSpace space = CoordinateSpace.World)
+    {
+        ArgumentNullException.ThrowIfNull(tilemap);
+
+        if (tileSize.X <= 0 || tileSize.Y <= 0)
+        {
+            throw new ArgumentOutOfRangeException(
+                nameof(tileSize),
+                "Tile size must be greater than zero.");
+        }
+
+        for (int y = 0; y < tilemap.Height; y++)
+        {
+            for (int x = 0; x < tilemap.Width; x++)
+            {
+                if (!tilemap.TryGetTileDefinition(
+                        x,
+                        y,
+                        out TileDefinition? tile))
+                {
+                    continue;
+                }
+
+                TextureRegion region = tile!.Region;
+
+                Vector2 tilePosition = new(
+                    position.X + (x * tileSize.X) + (tileSize.X * 0.5f),
+                    position.Y + (y * tileSize.Y) + (tileSize.Y * 0.5f));
+
+                Vector2 uvOffset = region.TopLeftUv;
+
+                Vector2 uvSize = new(
+                    region.BottomRightUv.X - region.TopLeftUv.X,
+                    region.BottomRightUv.Y - region.TopLeftUv.Y);
+
+                DrawSprite(
+                    tilePosition,
+                    tileSize,
+                    color,
+                    rotation: 0.0f,
+                    layer: layer,
+                    texture: region.Texture,
+                    flipHorizontal: false,
+                    flipVertical: false,
+                    uvOffset: uvOffset,
+                    uvSize: uvSize,
+                    space: space);
+            }
+        }
+    }
+
     
     
     public void DrawSpriteFrame(
